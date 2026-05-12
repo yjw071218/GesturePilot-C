@@ -15,37 +15,18 @@ class GestureCNN(nn.Module):
         super().__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(32, 32, kernel_size=3, padding=1),
-            nn.BatchNorm2d(32),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-            
             nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(64, 64, kernel_size=3, padding=1),
-            nn.BatchNorm2d(64),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
-            
             nn.Conv2d(64, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
-            nn.ReLU(inplace=True),
-            nn.Conv2d(128, 128, kernel_size=3, padding=1),
-            nn.BatchNorm2d(128),
             nn.ReLU(inplace=True),
             nn.MaxPool2d(2),
         )
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(128 * 12 * 12, 512),
-            nn.BatchNorm1d(512),
-            nn.ReLU(inplace=True),
-            nn.Dropout(0.5),
-            nn.Linear(512, 256),
-            nn.BatchNorm1d(256),
+            nn.Linear(128 * 12 * 12, 256),
             nn.ReLU(inplace=True),
             nn.Dropout(0.3),
             nn.Linear(256, num_classes),
@@ -78,7 +59,7 @@ def evaluate(model: nn.Module, loader: DataLoader, device: torch.device) -> tupl
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train GesturePilot baseline CNN.")
     parser.add_argument("--data-root", type=Path, default=Path("data/processed/gesture_dataset"))
-    parser.add_argument("--epochs", type=int, default=25)
+    parser.add_argument("--epochs", type=int, default=12)
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--output", type=Path, default=Path("models/gesturepilot.pt"))
@@ -95,19 +76,7 @@ def main() -> None:
     if not train_dir.exists() or not val_dir.exists():
         raise FileNotFoundError("Prepared dataset not found. Run scripts/prepare_dataset.py first.")
 
-    train_transform = transforms.Compose(
-        [
-            transforms.Resize((96, 96)),
-            transforms.RandomRotation(10),
-            transforms.RandomAffine(0, translate=(0.1, 0.1), scale=(0.9, 1.1)),
-            transforms.RandomHorizontalFlip(p=0.5),
-            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ]
-    )
-    
-    val_transform = transforms.Compose(
+    transform = transforms.Compose(
         [
             transforms.Resize((96, 96)),
             transforms.ToTensor(),
@@ -115,8 +84,8 @@ def main() -> None:
         ]
     )
 
-    train_ds = datasets.ImageFolder(train_dir, transform=train_transform)
-    val_ds = datasets.ImageFolder(val_dir, transform=val_transform)
+    train_ds = datasets.ImageFolder(train_dir, transform=transform)
+    val_ds = datasets.ImageFolder(val_dir, transform=transform)
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=0)
     val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, num_workers=0)
 

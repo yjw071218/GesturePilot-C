@@ -70,20 +70,6 @@ const char* action_to_string(action_t action) {
         case ACTION_PREV_SLIDE: return "prev_slide";
         case ACTION_VOLUME_UP: return "volume_up";
         case ACTION_VOLUME_DOWN: return "volume_down";
-        case ACTION_MOUSE_LEFT: return "mouse_left";
-        case ACTION_MOUSE_RIGHT: return "mouse_right";
-        case ACTION_MOUSE_UP: return "mouse_up";
-        case ACTION_MOUSE_DOWN: return "mouse_down";
-        case ACTION_MOUSE_CLICK_LEFT: return "mouse_click_left";
-        case ACTION_MOUSE_CLICK_RIGHT: return "mouse_click_right";
-        case ACTION_MOUSE_SCROLL_UP: return "mouse_scroll_up";
-        case ACTION_MOUSE_SCROLL_DOWN: return "mouse_scroll_down";
-        case ACTION_KEY_ENTER: return "key_enter";
-        case ACTION_KEY_ESC: return "key_esc";
-        case ACTION_KEY_SPACE: return "key_space";
-        case ACTION_KEY_BACKSPACE: return "key_backspace";
-        case ACTION_KEY_DELETE: return "key_delete";
-        case ACTION_KEY_TAB: return "key_tab";
         default: return "none";
     }
 }
@@ -95,21 +81,7 @@ action_t action_from_string(const char* text) {
         {"next_slide", ACTION_NEXT_SLIDE},
         {"prev_slide", ACTION_PREV_SLIDE},
         {"volume_up", ACTION_VOLUME_UP},
-        {"volume_down", ACTION_VOLUME_DOWN},
-        {"mouse_left", ACTION_MOUSE_LEFT},
-        {"mouse_right", ACTION_MOUSE_RIGHT},
-        {"mouse_up", ACTION_MOUSE_UP},
-        {"mouse_down", ACTION_MOUSE_DOWN},
-        {"mouse_click_left", ACTION_MOUSE_CLICK_LEFT},
-        {"mouse_click_right", ACTION_MOUSE_CLICK_RIGHT},
-        {"mouse_scroll_up", ACTION_MOUSE_SCROLL_UP},
-        {"mouse_scroll_down", ACTION_MOUSE_SCROLL_DOWN},
-        {"key_enter", ACTION_KEY_ENTER},
-        {"key_esc", ACTION_KEY_ESC},
-        {"key_space", ACTION_KEY_SPACE},
-        {"key_backspace", ACTION_KEY_BACKSPACE},
-        {"key_delete", ACTION_KEY_DELETE},
-        {"key_tab", ACTION_KEY_TAB}
+        {"volume_down", ACTION_VOLUME_DOWN}
     };
 
     size_t index;

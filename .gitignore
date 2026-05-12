@@ -1,7 +1,7 @@
-build\
-models\*.pt
-models\*.onnx
-data\processed\
-__pycache__\
+/build/
+/models/*.pt
+/models/*.onnx
+/data/raw/
+/data/processed/
+__pycache__/
 *.pyc
-
