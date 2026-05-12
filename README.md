@@ -88,6 +88,43 @@ cmake --build build --config Release
 .\build\Release\gesturepilot.exe --config config\gesturepilot.sample.ini
 ```
 
+## 실시간 카메라 기반 제어 (Python)
+
+완벽하게 학습된 CNN 모델을 사용하여 웹캠에서 실시간으로 손 제스처를 인식합니다:
+
+### 1. 제스처 인식 데모 (시각화만)
+```powershell
+pip install -r .\scripts\requirements.txt
+python .\scripts\gesturepilot_app.py --model models/gesturepilot.onnx --display
+```
+
+### 2. 완전한 PC 제어 (마우스/키보드)
+```powershell
+python .\scripts\gesturepilot_control.py --model models/gesturepilot.onnx --config config/gesturepilot.sample.ini --display
+```
+
+**기능:**
+- 실시간 카메라 피드에서 손 제스처 인식
+- 신뢰도 기반 필터링 (default: 0.80)
+- 시간축 안정화 (4연속 프레임 확인)
+- 마우스/키보드 자동 제어
+- 각 제스처에 대한 신뢰도 점수 표시
+
+**기본 제스처 매핑:**
+| 제스처 | 제어 |
+|-------|------|
+| 손가락 펼침 | 좌클릭 |
+| 한 손가락 | 마우스 우측이동 |
+| V자 | 마우스 좌측이동 |
+| 세 손가락 | 마우스 상단이동 |
+| 네 손가락 | 마우스 하단이동 |
+| 주먹 | 우클릭 |
+
+**옵션:**
+- `--camera <id>`: 카메라 디바이스 ID (기본값: 0)
+- `--display`: 비디오 피드 표시 (기본값: 활성화)
+- `--no-display`: 비디오 피드 미표시
+
 ## 설정 파일 예시
 
 `config\gesturepilot.sample.ini`
