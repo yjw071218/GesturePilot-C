@@ -236,6 +236,8 @@ def main():
     parser.add_argument("--config", type=str, default="config/gesturepilot.sample.ini",
                        help="Path to config file")
     parser.add_argument("--camera", type=int, default=0, help="Camera ID")
+    parser.add_argument("--display", action="store_true", default=True,
+                       help="Display video feed (enabled by default)")
     parser.add_argument("--no-display", action="store_true", help="Disable display")
     args = parser.parse_args()
     
