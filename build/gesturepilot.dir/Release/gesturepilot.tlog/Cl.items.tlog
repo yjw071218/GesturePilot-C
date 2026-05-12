@@ -1,0 +1,7 @@
+C:\Users\ME\GesturePilot-C\src\main.c;C:\Users\ME\GesturePilot-C\build\gesturepilot.dir\Release\main.obj
+C:\Users\ME\GesturePilot-C\src\config.c;C:\Users\ME\GesturePilot-C\build\gesturepilot.dir\Release\config.obj
+C:\Users\ME\GesturePilot-C\src\gesture_types.c;C:\Users\ME\GesturePilot-C\build\gesturepilot.dir\Release\gesture_types.obj
+C:\Users\ME\GesturePilot-C\src\temporal_filter.c;C:\Users\ME\GesturePilot-C\build\gesturepilot.dir\Release\temporal_filter.obj
+C:\Users\ME\GesturePilot-C\src\action_mapper.c;C:\Users\ME\GesturePilot-C\build\gesturepilot.dir\Release\action_mapper.obj
+C:\Users\ME\GesturePilot-C\src\inference_mock.c;C:\Users\ME\GesturePilot-C\build\gesturepilot.dir\Release\inference_mock.obj
+C:\Users\ME\GesturePilot-C\src\input_injector_win.c;C:\Users\ME\GesturePilot-C\build\gesturepilot.dir\Release\input_injector_win.obj

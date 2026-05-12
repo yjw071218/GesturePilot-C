@@ -1,0 +1,3 @@
+C:/Users/ME/GesturePilot-C/build/CMakeFiles/gesturepilot.dir
+C:/Users/ME/GesturePilot-C/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/ME/GesturePilot-C/build/CMakeFiles/ZERO_CHECK.dir

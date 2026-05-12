@@ -1,0 +1,7 @@
+build\
+models\*.pt
+models\*.onnx
+data\processed\
+__pycache__\
+*.pyc
+
