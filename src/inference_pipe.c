@@ -50,8 +50,10 @@ prediction_t inference_run(inference_ctx_t* context) {
 
     pipe = (FILE*)context->handle;
     if (fgets(line, sizeof(line), pipe) != NULL) {
-        // Format: GESTURE_NAME CONFIDENCE X Y IS_PINCHING
-        if (sscanf(line, "%63s %f %f %f %d", gesture_name, &result.confidence, &result.x, &result.y, &result.is_pinching) == 5) {
+        // Format: GESTURE_NAME CONFIDENCE X Y PINCH_MASK SCROLL_DELTA ZOOM_DELTA
+        if (sscanf(line, "%63s %f %f %f %d %d %d", 
+                   gesture_name, &result.confidence, &result.x, &result.y, 
+                   &result.pinch_mask, &result.scroll_delta, &result.zoom_delta) == 7) {
             result.gesture = gesture_from_string(gesture_name);
             if (result.gesture == GESTURE_KEY && strncmp(gesture_name, "KEY_", 4) == 0) {
                 strncpy(result.key_name, gesture_name + 4, sizeof(result.key_name) - 1);

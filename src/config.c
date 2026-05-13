@@ -34,7 +34,7 @@ void config_set_defaults(app_config_t* out_config) {
     out_config->cooldown_ms = 900;
     out_config->loop_interval_ms = 1;
     out_config->total_frames = 600;
-    out_config->dry_run = 1;
+    out_config->dry_run = 0;
     strncpy(out_config->model_path, "models\\gesturepilot.onnx", GP_MAX_PATH - 1);
 
     out_config->bindings[0].gesture = GESTURE_OPEN_PALM;

@@ -28,8 +28,10 @@ typedef struct prediction_t {
     float confidence;
     float x;
     float y;
-    int is_pinching;
+    int pinch_mask;
     char key_name[16];
+    int scroll_delta;
+    int zoom_delta;
 } prediction_t;
 
 const char* gesture_to_string(gesture_t gesture);

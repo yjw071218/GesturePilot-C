@@ -9,9 +9,11 @@ if not exist "venv" (
     echo Activating venv and installing dependencies...
     call venv\Scripts\activate.bat
     python -m pip install --upgrade pip
-    pip install mediapipe==0.10.14 opencv-python
+    pip install -r scripts/requirements.txt
 ) else (
     call venv\Scripts\activate.bat
+    echo Updating dependencies...
+    pip install -r scripts/requirements.txt
 )
 
 if not exist "build\Debug\gesturepilot.exe" (
