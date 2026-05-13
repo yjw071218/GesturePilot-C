@@ -1,6 +1,6 @@
-^C:\USERS\ME\GESTUREPILOT-C\BUILD\CMAKEFILES\02D626A2A374ECB418A4918D0B1B939D\GENERATE.STAMP.RULE
+^C:\USERS\YJW07\DOWNLOADS\GESTUREPILOT-C\BUILD\CMAKEFILES\B8E3C237F6D7EA614AA572B239674E44\GENERATE.STAMP.RULE
 setlocal
-C:\Users\ME\AppData\Local\Programs\Python\Python310\Lib\site-packages\cmake\data\bin\cmake.exe -SC:/Users/ME/GesturePilot-C -BC:/Users/ME/GesturePilot-C/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/ME/GesturePilot-C/build/GesturePilotC.slnx
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/yjw07/Downloads/GesturePilot-C -BC:/Users/yjw07/Downloads/GesturePilot-C/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/yjw07/Downloads/GesturePilot-C/build/GesturePilotC.slnx
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

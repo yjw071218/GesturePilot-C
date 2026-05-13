@@ -39,17 +39,15 @@ void config_set_defaults(app_config_t* out_config) {
 
     out_config->bindings[0].gesture = GESTURE_OPEN_PALM;
     out_config->bindings[0].action = ACTION_PLAY_PAUSE;
-    out_config->bindings[1].gesture = GESTURE_POINT;
-    out_config->bindings[1].action = ACTION_NEXT_SLIDE;
-    out_config->bindings[2].gesture = GESTURE_V_SIGN;
-    out_config->bindings[2].action = ACTION_PREV_SLIDE;
-    out_config->bindings[3].gesture = GESTURE_THREE;
-    out_config->bindings[3].action = ACTION_VOLUME_UP;
-    out_config->bindings[4].gesture = GESTURE_FOUR;
-    out_config->bindings[4].action = ACTION_VOLUME_DOWN;
-    out_config->bindings[5].gesture = GESTURE_FIST;
-    out_config->bindings[5].action = ACTION_CLICK_RIGHT;
-    out_config->binding_count = 6;
+    out_config->bindings[1].gesture = GESTURE_V_SIGN;
+    out_config->bindings[1].action = ACTION_PREV_SLIDE;
+    out_config->bindings[2].gesture = GESTURE_THREE;
+    out_config->bindings[2].action = ACTION_VOLUME_UP;
+    out_config->bindings[3].gesture = GESTURE_FOUR;
+    out_config->bindings[3].action = ACTION_VOLUME_DOWN;
+    out_config->bindings[4].gesture = GESTURE_FIST;
+    out_config->bindings[4].action = ACTION_CLICK_RIGHT;
+    out_config->binding_count = 5;
 }
 
 static int parse_int(const char* text, int* out_value) {
@@ -195,4 +193,3 @@ int config_load(const char* path, app_config_t* out_config, char* error_buffer, 
     fclose(file);
     return 1;
 }
-

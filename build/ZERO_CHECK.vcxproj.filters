@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\ME\GesturePilot-C\build\CMakeFiles\02d626a2a374ecb418a4918d0b1b939d\generate.stamp.rule">
+    <CustomBuild Include="C:\Users\yjw07\Downloads\GesturePilot-C\build\CMakeFiles\b8e3c237f6d7ea614aa572b239674e44\generate.stamp.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{B6D7CFA1-BFAB-3C42-BCD0-32CCA2A77B36}</UniqueIdentifier>
+      <UniqueIdentifier>{312EA9A5-6942-32EA-BED2-DA5246BBFAF5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

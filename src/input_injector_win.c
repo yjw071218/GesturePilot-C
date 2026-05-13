@@ -41,12 +41,23 @@ void input_injector_update_mouse(float x, float y, int pinch_mask, int scroll_de
     // Movement Calculation
     int should_move = !freeze_raw;
     
-    // Smooth the coordinates
-    float alpha = left_now ? 0.05f : 0.5f; 
-    smoothed_x = smoothed_x * (1.0f - alpha) + x * alpha;
-    smoothed_y = smoothed_y * (1.0f - alpha) + y * alpha;
+    // Adaptive Smoothing: 
+    // Higher jitter during movement, lower jitter (more lag) during precise actions.
+    // We use a dynamic alpha based on whether a click/pinch is active.
+    float target_alpha = 0.25f; // Reverted to fixed responsive alpha
+    
+    if (left_now) {
+        target_alpha = 0.03f; // Precision lock for dragging/clicking
+    } else if (freeze_raw) {
+        target_alpha = 0.01f; // Heavy lock-on during right-click/scroll
+    }
+
+    // Exponential moving average for smoothness
+    smoothed_x = smoothed_x * (1.0f - target_alpha) + x * target_alpha;
+    smoothed_y = smoothed_y * (1.0f - target_alpha) + y * target_alpha;
 
     if (should_move) {
+        // Precise sub-pixel to absolute mapping
         int abs_x = (int)(smoothed_x * 65535.0f);
         int abs_y = (int)(smoothed_y * 65535.0f);
 
@@ -55,7 +66,8 @@ void input_injector_update_mouse(float x, float y, int pinch_mask, int scroll_de
         input.type = INPUT_MOUSE;
         input.mi.dx = abs_x;
         input.mi.dy = abs_y;
-        input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+        // MOUSEEVENTF_VIRTUALDESK handles multi-monitor setups better
+        input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK;
         
         SendInput(1, &input, sizeof(INPUT));
     }
