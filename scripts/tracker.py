@@ -1,195 +1,228 @@
 import cv2
 import mediapipe as mp
 import math
-import sys
+import time
+from pynput.mouse import Button, Controller as MouseController
+from pynput.keyboard import Key, Controller as KeyboardController
+
+def get_dist(p1, p2):
+    return math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)
+
+def is_finger_bent_fast(hand_lms, tip_idx, pip_idx, mcp_idx):
+    # Tip-MCP vs PIP-MCP ratio. 
+    # Using 0.97 to be VERY sensitive for slight movements.
+    d_tip_mcp = get_dist(hand_lms[tip_idx], hand_lms[mcp_idx])
+    d_pip_mcp = get_dist(hand_lms[pip_idx], hand_lms[mcp_idx])
+    return d_tip_mcp < d_pip_mcp * 0.97
 
 def main():
+    mouse = MouseController()
+    keyboard = KeyboardController()
+    
     mp_hands = mp.solutions.hands
+    mp_face_mesh = mp.solutions.face_mesh
     mp_drawing = mp.solutions.drawing_utils
     mp_drawing_styles = mp.solutions.drawing_styles
 
     hands = mp_hands.Hands(
         static_image_mode=False,
-        max_num_hands=1,
-        min_detection_confidence=0.5, # Reduced for faster detection
-        min_tracking_confidence=0.5,    # Reduced for faster tracking
-        model_complexity=0 # Use simplest model for lowest latency
+        max_num_hands=2,
+        min_detection_confidence=0.4, # Lowered slightly to prevent tracking loss during fast motion
+        min_tracking_confidence=0.4,
+        model_complexity=0
+    )
+
+    face_mesh = mp_face_mesh.FaceMesh(
+        max_num_faces=1,
+        refine_landmarks=True, 
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5
     )
 
     cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        print("GESTURE_NONE 0.0 0.5 0.5 0", flush=True)
-        return
+    if not cap.isOpened(): return
 
-    # Optimize camera for lower latency
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320) # Lower resolution for faster processing
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
-    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1) # Minimize camera buffer
+    # Ensure maximum framerate
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640) 
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
+    LEFT_IRIS = [474, 475, 476, 477]
+    RIGHT_IRIS = [469, 470, 471, 472]
 
-    finger_tips = [
-        mp_hands.HandLandmark.INDEX_FINGER_TIP,
-        mp_hands.HandLandmark.MIDDLE_FINGER_TIP,
-        mp_hands.HandLandmark.RING_FINGER_TIP,
-        mp_hands.HandLandmark.PINKY_TIP
-    ]
-    finger_pips = [
-        mp_hands.HandLandmark.INDEX_FINGER_PIP,
-        mp_hands.HandLandmark.MIDDLE_FINGER_PIP,
-        mp_hands.HandLandmark.RING_FINGER_PIP,
-        mp_hands.HandLandmark.PINKY_PIP
-    ]
-
-    # Keyboard setup
-    keys = [["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
-            ["A", "S", "D", "F", "G", "H", "J", "K", "L", ";"],
-            ["Z", "X", "C", "V", "B", "N", "M", ",", ".", "/"],
-            ["SPACE", "BACKSPACE", "ENTER"]]
+    # States
+    rhythm_mode = False
+    last_rhythm_toggle_time = 0
+    last_left_pinch_pos = None
+    left_pinch_threshold = 0.04
     
-    class Button():
-        def __init__(self, pos, text, size=[40, 40]):
-            self.pos = pos
-            self.size = size
-            self.text = text
+    is_left_down = False
+    is_right_down = False
+    active_pinch_type = None
+    last_scroll_y = 0
 
-    buttonList = []
-    for i in range(len(keys)):
-        for j, key in enumerate(keys[i]):
-            buttonList.append(Button([50 * j + 20, 50 * i + 200], key))
+    # Key management: Current real-time state
+    key_states = {'w': False, 'd': False, 'k': False, 'p': False}
 
-    def drawAll(img, buttonList):
-        for button in buttonList:
-            x, y = button.pos
-            w, h = button.size
-            cv2.rectangle(img, button.pos, (x + w, y + h), (255, 0, 255), cv2.FILLED)
-            cv2.putText(img, button.text, (x + 10, y + 30),
-                        cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 255), 2)
-        return img
+    def get_gaze_point(face_landmarks):
+        lx = (face_landmarks[474].x + face_landmarks[476].x) / 2
+        ly = (face_landmarks[474].y + face_landmarks[476].y) / 2
+        rx = (face_landmarks[469].x + face_landmarks[471].x) / 2
+        ry = (face_landmarks[469].y + face_landmarks[471].y) / 2
+        nose = face_landmarks[168]
+        dx, dy = ((lx+rx)/2 - nose.x) * 12 + 0.5, ((ly+ry)/2 - nose.y) * 12 + 0.5
+        return max(0, min(1, dx)), max(0, min(1, dy))
 
-    last_click_time = 0
-    clicked_key = None
+    def map_to_screen(val, margin=0.25):
+        return max(0, min(1, (val - margin) / (1 - 2 * margin)))
 
     while True:
         success, image = cap.read()
-        if not success:
-            continue
+        if not success: continue
 
-        # Flip image horizontally for natural mirroring
         image = cv2.flip(image, 1)
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = hands.process(image_rgb)
-
-        gesture = "GESTURE_NONE"
-        confidence = 0.0
-        x, y = 0.5, 0.5
-        is_pinching = 0
         
-        # Draw keyboard
-        image = drawAll(image, buttonList)
+        hand_results = hands.process(image_rgb)
+        face_results = None
+        if not rhythm_mode:
+            face_results = face_mesh.process(image_rgb)
 
-        if results.multi_hand_landmarks and results.multi_handedness:
-            # Only process first hand
-            hand_landmarks = results.multi_hand_landmarks[0]
-            handedness = results.multi_handedness[0].classification[0].label
-            landmarks = hand_landmarks.landmark
-            
-            # Draw the hand annotations on the image.
-            mp_drawing.draw_landmarks(
-                image,
-                hand_landmarks,
-                mp_hands.HAND_CONNECTIONS,
-                mp_drawing_styles.get_default_hand_landmarks_style(),
-                mp_drawing_styles.get_default_hand_connections_style())
+        gaze_x, gaze_y = 0.5, 0.5
+        if face_results and face_results.multi_face_landmarks:
+            gaze_x, gaze_y = get_gaze_point(face_results.multi_face_landmarks[0].landmark)
 
-            # Pinch detection (Thumb tip and Index tip)
-            thumb_tip = landmarks[mp_hands.HandLandmark.THUMB_TIP]
-            index_tip = landmarks[mp_hands.HandLandmark.INDEX_FINGER_TIP]
-            middle_tip = landmarks[mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
-            
-            # Index pinch for mouse click/drag
-            dx = thumb_tip.x - index_tip.x
-            dy = thumb_tip.y - index_tip.y
-            distance = math.sqrt(dx*dx + dy*dy)
-            
-            if distance < 0.04:
-                is_pinching = 1
-                x = (thumb_tip.x + index_tip.x) / 2.0
-                y = (thumb_tip.y + index_tip.y) / 2.0
-            else:
-                x = index_tip.x
-                y = index_tip.y
-
-            # Middle finger pinch for Keyboard typing
-            dmx = thumb_tip.x - middle_tip.x
-            dmy = thumb_tip.y - middle_tip.y
-            dist_middle = math.sqrt(dmx*dmx + dmy*dmy)
-            
-            h, w, c = image.shape
-            cursor_x, cursor_y = int(index_tip.x * w), int(index_tip.y * h)
-
-            if dist_middle < 0.04:
-                current_time = math.floor(math.get_time() * 1000) if hasattr(math, 'get_time') else int(math.fmod(cv2.getTickCount() / cv2.getTickFrequency() * 1000, 1000000000))
-                
-                # Check keyboard buttons
-                for button in buttonList:
-                    bx, by = button.pos
-                    bw, bh = button.size
-                    if bx < cursor_x < bx + bw and by < cursor_y < by + bh:
-                        if clicked_key != button.text:
-                            # Use custom gesture for key press
-                            gesture = f"KEY_{button.text}"
-                            confidence = 0.99
-                            clicked_key = button.text
-                            # Visual feedback
-                            cv2.rectangle(image, button.pos, (bx + bw, by + bh), (0, 255, 0), cv2.FILLED)
-                
-            else:
-                clicked_key = None
-
-            # Determine other gestures only if not pinching
-            if not is_pinching and gesture == "GESTURE_NONE":
-                fingers_state = []
-                # Thumb
-                if handedness == "Right":
-                    fingers_state.append(thumb_tip.x < landmarks[mp_hands.HandLandmark.THUMB_IP].x)
-                else:
-                    fingers_state.append(thumb_tip.x > landmarks[mp_hands.HandLandmark.THUMB_IP].x)
-                # Others
-                for tip_idx, pip_idx in zip(finger_tips, finger_pips):
-                    fingers_state.append(landmarks[tip_idx].y < landmarks[pip_idx].y)
-                
-                fingers_extended = sum(fingers_state)
-                
-                if fingers_extended == 0:
-                    gesture = "GESTURE_FIST"
-                    confidence = 0.95
-                elif fingers_extended == 1 and fingers_state[1]:
-                    gesture = "GESTURE_POINT"
-                    confidence = 0.95
-                elif fingers_extended == 2 and fingers_state[1] and fingers_state[2]:
-                    gesture = "GESTURE_V_SIGN"
-                    confidence = 0.95
-                elif fingers_extended >= 4:
-                    gesture = "GESTURE_OPEN_PALM"
-                    confidence = 0.95
-                else:
-                    gesture = "GESTURE_UNKNOWN"
-                    confidence = 0.5
-
-
-        # Send data to C program
-        try:
-            print(f"{gesture} {confidence:.2f} {x:.4f} {y:.4f} {is_pinching}", flush=True)
-        except OSError:
-            # The C program closed the pipe, so we should exit gracefully
-            break
-
-        # Show the camera overlay window
-        cv2.imshow('GesturePilot Camera Overlay', image)
+        current_pinch = None
+        hand_pos = (0.5, 0.5)
+        hand_detected = False
         
-        # Press 'q' to quit, also processes GUI events needed for cv2.imshow
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # Reset current frame key detections to False, then update based on landmarks
+        # This ensures simultaneous presses are caught in one frame
+        detected_keys_this_frame = {'w': False, 'd': False, 'k': False, 'p': False}
+        
+        if hand_results.multi_hand_landmarks:
+            right_idx, left_idx = -1, -1
+            for i, handedness in enumerate(hand_results.multi_handedness):
+                if handedness.classification[0].label == "Right": right_idx = i
+                else: left_idx = i
+            
+            if right_idx != -1 or left_idx != -1:
+                hand_detected = True
+            
+            # --- Left Hand ---
+            if left_idx != -1:
+                l_lms = hand_results.multi_hand_landmarks[left_idx].landmark
+                
+                # Mode Toggle
+                if get_dist(l_lms[4], l_lms[20]) < 0.05:
+                    if time.time() - last_rhythm_toggle_time > 1.0:
+                        rhythm_mode = not rhythm_mode
+                        last_rhythm_toggle_time = time.time()
+                
+                # Rhythm Keys (w, d)
+                if rhythm_mode:
+                    detected_keys_this_frame['w'] = is_finger_bent_fast(l_lms, 12, 10, 9)
+                    detected_keys_this_frame['d'] = is_finger_bent_fast(l_lms, 8, 6, 5)
+                else:
+                    # Vol/Nav
+                    if get_dist(l_lms[4], l_lms[8]) < 0.05:
+                        curr = (l_lms[4].x+l_lms[8].x)/2, (l_lms[4].y+l_lms[8].y)/2
+                        if last_left_pinch_pos:
+                            dx, dy = curr[0]-last_left_pinch_pos[0], curr[1]-last_left_pinch_pos[1]
+                            if abs(dx) > left_pinch_threshold:
+                                with keyboard.pressed(Key.alt):
+                                    keyboard.tap(Key.right if dx > 0 else Key.left)
+                                last_left_pinch_pos = curr
+                            if abs(dy) > left_pinch_threshold:
+                                keyboard.tap(Key.media_volume_down if dy > 0 else Key.media_volume_up)
+                                last_left_pinch_pos = curr
+                        else: last_left_pinch_pos = curr
+                    else: last_left_pinch_pos = None
+
+            # --- Right Hand ---
+            if right_idx != -1:
+                r_lms = hand_results.multi_hand_landmarks[right_idx].landmark
+                if rhythm_mode:
+                    detected_keys_this_frame['k'] = is_finger_bent_fast(r_lms, 8, 6, 5)
+                    detected_keys_this_frame['p'] = is_finger_bent_fast(r_lms, 12, 10, 9)
+                else:
+                    # Normal Actions
+                    d_idx, d_mid, d_rng = get_dist(r_lms[4], r_lms[8]), get_dist(r_lms[4], r_lms[12]), get_dist(r_lms[4], r_lms[16])
+                    T, R = 0.07, 0.12
+                    if active_pinch_type == "L" and d_idx < R: current_pinch = "L"
+                    elif active_pinch_type == "S" and d_mid < R: current_pinch = "S"
+                    elif active_pinch_type == "R" and d_rng < R: current_pinch = "R"
+                    
+                    if not current_pinch:
+                        if d_rng < T: current_pinch = "R"
+                        elif d_mid < T: current_pinch = "S"
+                        elif d_idx < T: current_pinch = "L"
+                    
+                    hand_pos = (r_lms[9].x, r_lms[9].y)
+                    if current_pinch == "L": hand_pos = ((r_lms[4].x+r_lms[8].x)/2, (r_lms[4].y+r_lms[8].y)/2)
+
+        # --- KEY STATE SYNC (CRITICAL FOR CHORDS/RAPID TAPS) ---
+        if rhythm_mode:
+            for k in ['w', 'd', 'k', 'p']:
+                is_detected = detected_keys_this_frame[k]
+                if is_detected and not key_states[k]:
+                    keyboard.press(k)
+                    key_states[k] = True
+                elif not is_detected and key_states[k]:
+                    keyboard.release(k)
+                    key_states[k] = False
+
+        # --- Injection & Drawing ---
+        if not rhythm_mode:
+            if current_pinch == "L":
+                if not is_left_down: mouse.press(Button.left); is_left_down = True
+            else:
+                if is_left_down: mouse.release(Button.left); is_left_down = False
+
+            if current_pinch == "R":
+                if not is_right_down: mouse.press(Button.right); is_right_down = True
+            else:
+                if is_right_down: mouse.release(Button.right); is_right_down = False
+
+            if current_pinch == "S":
+                cy = r_lms[12].y
+                if last_scroll_y != 0:
+                    dy = last_scroll_y - cy
+                    if abs(dy) > 0.005:
+                        mouse.scroll(0, 1 if dy > 0 else -1)
+                        last_scroll_y = cy
+                else: last_scroll_y = cy
+            else: last_scroll_y = 0
+
+            freeze = (current_pinch in ["R", "S"]) or (current_pinch == "L")
+            tx, ty = map_to_screen(hand_pos[0]*0.7 + gaze_x*0.3, 0.25), map_to_screen(hand_pos[1]*0.7 + gaze_y*0.3, 0.25)
+            
+            p_mask = 0
+            if not hand_detected: p_mask |= 16
+            elif freeze: p_mask |= 16
+            
+            gesture_name = "point" if hand_detected else "none"
+            print(f"{gesture_name} 1.0 {tx:.4f} {ty:.4f} {p_mask} 0 0", flush=True)
+
+            if hand_results.multi_hand_landmarks:
+                for hand_lms in hand_results.multi_hand_landmarks:
+                    mp_drawing.draw_landmarks(image, hand_lms, mp_hands.HAND_CONNECTIONS,
+                                            mp_drawing_styles.get_default_hand_landmarks_style(),
+                                            mp_drawing_styles.get_default_hand_connections_style())
+        else:
+            print(f"none 1.0 0.5 0.5 16 0 0", flush=True)
+
+        active_pinch_type = current_pinch
+        ui_text = f"MODE: {'RHYTHM' if rhythm_mode else 'NORMAL'}"
+        cv2.putText(image, ui_text, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+        if rhythm_mode:
+            # Show active keys for feedback
+            active_keys_str = " ".join([k.upper() for k, v in key_states.items() if v])
+            if active_keys_str:
+                cv2.putText(image, f"KEYS: {active_keys_str}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+        cv2.imshow('GesturePilot', image)
+        if cv2.waitKey(1) & 0xFF == ord('q'): break
 
     cap.release()
     cv2.destroyAllWindows()
