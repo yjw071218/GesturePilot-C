@@ -8,6 +8,7 @@ typedef enum gesture_t {
     GESTURE_THREE,
     GESTURE_FOUR,
     GESTURE_OPEN_PALM,
+    GESTURE_KEY,
     GESTURE_UNKNOWN
 } gesture_t;
 
@@ -18,7 +19,8 @@ typedef enum action_t {
     ACTION_PREV_SLIDE,
     ACTION_VOLUME_UP,
     ACTION_VOLUME_DOWN,
-    ACTION_CLICK_RIGHT
+    ACTION_CLICK_RIGHT,
+    ACTION_TYPE_KEY
 } action_t;
 
 typedef struct prediction_t {
@@ -27,6 +29,7 @@ typedef struct prediction_t {
     float x;
     float y;
     int is_pinching;
+    char key_name[16];
 } prediction_t;
 
 const char* gesture_to_string(gesture_t gesture);

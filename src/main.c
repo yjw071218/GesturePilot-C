@@ -98,13 +98,18 @@ int main(int argc, char** argv) {
         gesture_t stable_gesture = GESTURE_UNKNOWN;
         unsigned long long timestamp = now_ms();
 
-        printf("[frame %04d] pred=%-10s conf=%.2f x=%.2f y=%.2f pinch=%d\n", index + 1, gesture_to_string(prediction.gesture), prediction.confidence, prediction.x, prediction.y, prediction.is_pinching);
+        printf("[frame %04d] pred=%-10s conf=%.2f x=%.2f y=%.2f pinch=%d key=%s\n", 
+               index + 1, gesture_to_string(prediction.gesture), prediction.confidence, 
+               prediction.x, prediction.y, prediction.is_pinching, prediction.key_name);
 
         if (prediction.confidence > 0.0f) {
             input_injector_update_mouse(prediction.x, prediction.y, prediction.is_pinching, config.dry_run);
         }
 
-        if (temporal_filter_update(&filter, prediction, timestamp, &stable_gesture)) {
+        // Handle typing directly without temporal filtering for responsiveness
+        if (prediction.gesture == GESTURE_KEY && prediction.confidence > 0.8f) {
+            input_injector_type_key(prediction.key_name, config.dry_run);
+        } else if (temporal_filter_update(&filter, prediction, timestamp, &stable_gesture)) {
             action_t action = action_mapper_resolve(&config, stable_gesture);
             printf("  -> stable=%s action=%s\n", gesture_to_string(stable_gesture), action_to_string(action));
             if (!input_injector_execute(action, config.dry_run)) {

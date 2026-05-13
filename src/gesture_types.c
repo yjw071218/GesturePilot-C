@@ -33,6 +33,7 @@ const char* gesture_to_string(gesture_t gesture) {
         case GESTURE_THREE: return "three";
         case GESTURE_FOUR: return "four";
         case GESTURE_OPEN_PALM: return "open_palm";
+        case GESTURE_KEY: return "key";
         default: return "unknown";
     }
 }
@@ -45,12 +46,17 @@ gesture_t gesture_from_string(const char* text) {
         {"v_sign", GESTURE_V_SIGN},
         {"three", GESTURE_THREE},
         {"four", GESTURE_FOUR},
-        {"open_palm", GESTURE_OPEN_PALM}
+        {"open_palm", GESTURE_OPEN_PALM},
+        {"key", GESTURE_KEY}
     };
 
     size_t index;
     if (text == NULL) {
         return GESTURE_UNKNOWN;
+    }
+
+    if (strncmp(text, "KEY_", 4) == 0) {
+        return GESTURE_KEY;
     }
 
     for (index = 0; index < sizeof(map) / sizeof(map[0]); ++index) {

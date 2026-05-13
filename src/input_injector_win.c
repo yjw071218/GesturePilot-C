@@ -67,18 +67,17 @@ void input_injector_update_mouse(float x, float y, int is_pinching, int dry_run)
         return;
     }
 
-    int screen_w = GetSystemMetrics(SM_CXSCREEN);
-    int screen_h = GetSystemMetrics(SM_CYSCREEN);
-
     // Exponential moving average for smoothing
-    float alpha = 0.5f; // Increased from 0.3f for better responsiveness
+    // Use lower alpha (more smoothing) when pinching to prevent cursor jitter during clicks
+    float alpha = is_pinching ? 0.05f : 0.5f; 
+    
     smoothed_x = smoothed_x * (1.0f - alpha) + x * alpha;
     smoothed_y = smoothed_y * (1.0f - alpha) + y * alpha;
 
     int abs_x = (int)(smoothed_x * 65535.0f);
     int abs_y = (int)(smoothed_y * 65535.0f);
 
-    INPUT inputs[2];
+    INPUT inputs[3];
     ZeroMemory(inputs, sizeof(inputs));
     int input_count = 0;
 
@@ -101,5 +100,30 @@ void input_injector_update_mouse(float x, float y, int is_pinching, int dry_run)
 
     last_is_pinching = is_pinching;
     SendInput(input_count, inputs, sizeof(INPUT));
+}
+
+void input_injector_type_key(const char* key_name, int dry_run) {
+    if (key_name == NULL || *key_name == '\0' || dry_run) {
+        return;
+    }
+
+    WORD vk = 0;
+    if (strlen(key_name) == 1) {
+        char c = key_name[0];
+        if (c >= 'A' && c <= 'Z') vk = c;
+        else if (c >= 'a' && c <= 'z') vk = c - ('a' - 'A');
+        else if (c == ';') vk = VK_OEM_1;
+        else if (c == ',') vk = VK_OEM_COMMA;
+        else if (c == '.') vk = VK_OEM_PERIOD;
+        else if (c == '/') vk = VK_OEM_2;
+    } else {
+        if (strcmp(key_name, "SPACE") == 0) vk = VK_SPACE;
+        else if (strcmp(key_name, "BACKSPACE") == 0) vk = VK_BACK;
+        else if (strcmp(key_name, "ENTER") == 0) vk = VK_RETURN;
+    }
+
+    if (vk != 0) {
+        send_key(vk);
+    }
 }
 
