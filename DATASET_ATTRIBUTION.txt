@@ -1,8 +1,0 @@
-GesturePilot-C currently uses:
-
-Sign Language Digits Dataset
-- Source: https://github.com/ardamavi/Sign-Language-Digits-Dataset
-- Authors: Turkey Ankara Ayranci Anadolu High School students
-- Paper: Mavi, A. (2020), arXiv:2011.08927
-- License: Apache-2.0 (see data\raw\sign-language-digits\LICENSE)
-

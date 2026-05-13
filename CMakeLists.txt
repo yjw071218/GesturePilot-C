@@ -11,7 +11,7 @@ add_executable(gesturepilot
     src/gesture_types.c
     src/temporal_filter.c
     src/action_mapper.c
-    src/inference_mock.c
+    src/inference_pipe.c
 )
 
 if (WIN32)

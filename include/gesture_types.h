@@ -17,12 +17,16 @@ typedef enum action_t {
     ACTION_NEXT_SLIDE,
     ACTION_PREV_SLIDE,
     ACTION_VOLUME_UP,
-    ACTION_VOLUME_DOWN
+    ACTION_VOLUME_DOWN,
+    ACTION_CLICK_RIGHT
 } action_t;
 
 typedef struct prediction_t {
     gesture_t gesture;
     float confidence;
+    float x;
+    float y;
+    int is_pinching;
 } prediction_t;
 
 const char* gesture_to_string(gesture_t gesture);

@@ -31,8 +31,7 @@ static int send_key(WORD vk) {
 }
 
 int input_injector_execute(action_t action, int dry_run) {
-    WORD vk = action_to_vk(action);
-    if (action == ACTION_NONE || vk == 0) {
+    if (action == ACTION_NONE) {
         return 1;
     }
 
@@ -41,6 +40,66 @@ int input_injector_execute(action_t action, int dry_run) {
         return 1;
     }
 
+    if (action == ACTION_CLICK_RIGHT) {
+        INPUT inputs[2];
+        ZeroMemory(inputs, sizeof(inputs));
+        inputs[0].type = INPUT_MOUSE;
+        inputs[0].mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+        inputs[1].type = INPUT_MOUSE;
+        inputs[1].mi.dwFlags = MOUSEEVENTF_RIGHTUP;
+        return SendInput(2, inputs, sizeof(INPUT)) == 2 ? 1 : 0;
+    }
+
+    WORD vk = action_to_vk(action);
+    if (vk == 0) {
+        return 1;
+    }
+
     return send_key(vk);
+}
+
+static int last_is_pinching = 0;
+static float smoothed_x = 0.5f;
+static float smoothed_y = 0.5f;
+
+void input_injector_update_mouse(float x, float y, int is_pinching, int dry_run) {
+    if (dry_run) {
+        return;
+    }
+
+    int screen_w = GetSystemMetrics(SM_CXSCREEN);
+    int screen_h = GetSystemMetrics(SM_CYSCREEN);
+
+    // Exponential moving average for smoothing
+    float alpha = 0.5f; // Increased from 0.3f for better responsiveness
+    smoothed_x = smoothed_x * (1.0f - alpha) + x * alpha;
+    smoothed_y = smoothed_y * (1.0f - alpha) + y * alpha;
+
+    int abs_x = (int)(smoothed_x * 65535.0f);
+    int abs_y = (int)(smoothed_y * 65535.0f);
+
+    INPUT inputs[2];
+    ZeroMemory(inputs, sizeof(inputs));
+    int input_count = 0;
+
+    // Always move mouse
+    inputs[input_count].type = INPUT_MOUSE;
+    inputs[input_count].mi.dx = abs_x;
+    inputs[input_count].mi.dy = abs_y;
+    inputs[input_count].mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+    input_count++;
+
+    if (is_pinching && !last_is_pinching) {
+        inputs[input_count].type = INPUT_MOUSE;
+        inputs[input_count].mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+        input_count++;
+    } else if (!is_pinching && last_is_pinching) {
+        inputs[input_count].type = INPUT_MOUSE;
+        inputs[input_count].mi.dwFlags = MOUSEEVENTF_LEFTUP;
+        input_count++;
+    }
+
+    last_is_pinching = is_pinching;
+    SendInput(input_count, inputs, sizeof(INPUT));
 }
 

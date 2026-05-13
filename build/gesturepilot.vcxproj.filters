@@ -16,7 +16,7 @@
     <ClCompile Include="C:\Users\ME\GesturePilot-C\src\action_mapper.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\ME\GesturePilot-C\src\inference_mock.c">
+    <ClCompile Include="C:\Users\ME\GesturePilot-C\src\inference_pipe.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="C:\Users\ME\GesturePilot-C\src\input_injector_win.c">

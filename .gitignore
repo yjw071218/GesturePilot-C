@@ -1,7 +1,11 @@
 /build/
-/models/*.pt
-/models/*.onnx
-/data/raw/
-/data/processed/
+/venv/
+/models/
+/data/
 __pycache__/
 *.pyc
+.vs/
+*.user
+*.suo
+bin/
+obj/

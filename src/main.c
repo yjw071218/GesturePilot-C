@@ -87,12 +87,22 @@ int main(int argc, char** argv) {
     printf("  dry_run=%d stable_frames=%d threshold=%.2f cooldown=%dms frames=%d\n",
            config.dry_run, config.stable_frames, config.confidence_threshold, config.cooldown_ms, config.total_frames);
 
-    for (index = 0; index < config.total_frames; ++index) {
+    for (index = 0; config.total_frames <= 0 || index < config.total_frames; ++index) {
         prediction_t prediction = inference_run(&inference_context);
+        
+        // If confidence is negative, it might indicate the pipe is closed or tracking failed permanently
+        if (prediction.gesture == GESTURE_NONE && prediction.confidence < 0.0f) {
+            break;
+        }
+
         gesture_t stable_gesture = GESTURE_UNKNOWN;
         unsigned long long timestamp = now_ms();
 
-        printf("[frame %04d] pred=%-10s conf=%.2f\n", index + 1, gesture_to_string(prediction.gesture), prediction.confidence);
+        printf("[frame %04d] pred=%-10s conf=%.2f x=%.2f y=%.2f pinch=%d\n", index + 1, gesture_to_string(prediction.gesture), prediction.confidence, prediction.x, prediction.y, prediction.is_pinching);
+
+        if (prediction.confidence > 0.0f) {
+            input_injector_update_mouse(prediction.x, prediction.y, prediction.is_pinching, config.dry_run);
+        }
 
         if (temporal_filter_update(&filter, prediction, timestamp, &stable_gesture)) {
             action_t action = action_mapper_resolve(&config, stable_gesture);

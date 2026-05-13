@@ -32,7 +32,7 @@ void config_set_defaults(app_config_t* out_config) {
     out_config->confidence_threshold = 0.80f;
     out_config->stable_frames = 4;
     out_config->cooldown_ms = 900;
-    out_config->loop_interval_ms = 33;
+    out_config->loop_interval_ms = 1;
     out_config->total_frames = 600;
     out_config->dry_run = 1;
     strncpy(out_config->model_path, "models\\gesturepilot.onnx", GP_MAX_PATH - 1);
@@ -47,7 +47,9 @@ void config_set_defaults(app_config_t* out_config) {
     out_config->bindings[3].action = ACTION_VOLUME_UP;
     out_config->bindings[4].gesture = GESTURE_FOUR;
     out_config->bindings[4].action = ACTION_VOLUME_DOWN;
-    out_config->binding_count = 5;
+    out_config->bindings[5].gesture = GESTURE_FIST;
+    out_config->bindings[5].action = ACTION_CLICK_RIGHT;
+    out_config->binding_count = 6;
 }
 
 static int parse_int(const char* text, int* out_value) {

@@ -70,6 +70,7 @@ const char* action_to_string(action_t action) {
         case ACTION_PREV_SLIDE: return "prev_slide";
         case ACTION_VOLUME_UP: return "volume_up";
         case ACTION_VOLUME_DOWN: return "volume_down";
+        case ACTION_CLICK_RIGHT: return "click_right";
         default: return "none";
     }
 }
@@ -81,7 +82,8 @@ action_t action_from_string(const char* text) {
         {"next_slide", ACTION_NEXT_SLIDE},
         {"prev_slide", ACTION_PREV_SLIDE},
         {"volume_up", ACTION_VOLUME_UP},
-        {"volume_down", ACTION_VOLUME_DOWN}
+        {"volume_down", ACTION_VOLUME_DOWN},
+        {"click_right", ACTION_CLICK_RIGHT}
     };
 
     size_t index;
