@@ -1,27 +1,28 @@
-# Troubleshooting Guide
+# 문제 해결 가이드
 
-If you encounter issues with GesturePilot-C, check this guide for common solutions.
+GesturePilot-C 사용 중 문제가 발생할 경우 이 가이드를 참조하세요.
 
-## ⚠️ Common Issues
+## ⚠️ 일반적인 문제들
 
-### 1. Cursor Jitter or Jumping
-- **Lighting**: Ensure your hand is well-lit. Avoid strong backlighting (like a window behind you).
-- **Background**: A complex or moving background can confuse the tracker. Try a plain background.
-- **Distance**: Keep your hand between 0.5m and 1.5m from the camera.
+### 1. 커서가 떨리거나 튀는 현상
+- **조명**: 손이 잘 보이도록 밝은 환경에서 사용하세요. 역광(등 뒤에 창문이 있는 경우)은 피하는 것이 좋습니다.
+- **배경**: 복잡하거나 움직이는 배경은 트래커를 혼동시킬 수 있습니다. 가급적 단순한 배경을 사용하세요.
+- **거리**: 카메라로부터 0.5m에서 1.5m 사이의 거리를 유지하세요.
+- **적응형 필터**: 현재 적응형 EMA 필터가 적용되어 정지 상태에서는 떨림이 거의 없어야 합니다. 문제가 지속되면 `scripts/tracker.py`의 `MIN_ALPHA` 값을 낮춰보세요.
 
-### 2. Gestures Not Registering
-- **Hand Visibility**: Ensure your entire hand is within the camera's field of view.
-- **Speed**: If you move too fast, MediaPipe may lose track. Try smoother movements.
-- **Calibration**: If finger bends aren't detected, check the `bend ratio` in `scripts/tracker.py`.
+### 2. 제스처 인식이 잘 안 될 때
+- **손 가시성**: 손 전체가 카메라 화면 안에 들어와 있는지 확인하세요.
+- **속도**: 너무 빠르게 움직이면 MediaPipe가 추적을 놓칠 수 있습니다. 약간 더 부드럽게 움직여 보세요.
+- **신뢰도 임계값**: 현재 신뢰도 임계값이 0.8로 설정되어 있어 보안성이 높습니다. 인식이 너무 안 된다면 `tracker.py`의 `min_detection_confidence`를 0.7 정도로 낮춰보세요.
 
-### 3. High CPU Usage
-- The system is optimized, but MediaPipe is a heavy AI model.
-- Close other camera-intensive apps.
-- Reduce your webcam's resolution in `scripts/tracker.py` if necessary.
+### 3. 높은 CPU 점유율
+- 시스템이 최적화되어 있지만, MediaPipe AI 모델은 자원을 많이 사용합니다.
+- 카메라를 사용하는 다른 앱을 종료하세요.
+- 필요한 경우 `scripts/tracker.py`에서 웹캠 해상도를 더 낮게 설정하세요.
 
-### 4. Build Errors
-- Ensure you have the **Visual Studio Build Tools** (C++ Desktop Development) installed.
-- Check that CMake is added to your system PATH.
+### 4. 빌드 오류
+- **Visual Studio Build Tools** (C++ 데스크톱 개발)가 설치되어 있는지 확인하세요.
+- CMake가 시스템 환경 변수(PATH)에 추가되어 있는지 확인하세요.
 
-## 💬 Getting Support
-If you find a bug, please open an issue on the GitHub repository.
+## 💬 지원 받기
+버그를 발견하셨다면 GitHub 저장소에 Issue를 남겨주세요.

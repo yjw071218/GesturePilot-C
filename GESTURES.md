@@ -1,34 +1,41 @@
-# Gesture Guide
+# 제스처 가이드
 
-This guide explains the hand gestures used to control GesturePilot-C in both Normal and Rhythm modes.
+이 가이드는 GesturePilot-C의 일반 모드와 리듬 모드에서 사용되는 손동작 제스처를 설명합니다.
 
-## 🖱 Normal Mode (Mouse Control)
+## 🖱 일반 모드 (마우스 제어)
 
-| Action | Gesture | Description |
+| 동작 | 제스처 | 설명 |
 | :--- | :--- | :--- |
-| **Move Cursor** | Point | Move your right hand. The cursor follows a mix of hand and gaze. |
-| **Left Click** | Index Pinch | Touch your right thumb and index finger. |
-| **Right Click** | Ring Pinch | Touch your right thumb and ring finger. |
-| **Scroll** | Middle Pinch | Touch right thumb and middle finger, then move up/down. |
-| **Zoom** | Double Pinch | Pinch thumb+index on **both hands** and move them apart/together. |
-| **Volume Up/Down** | Left Pinch | Pinch left thumb+index and move vertically. |
+| **커서 이동** | 포인팅 | 오른손을 움직입니다. 커서는 손의 위치와 시선의 위치를 결합하여 따라옵니다. |
+| **왼쪽 클릭** | 검지 핀치 | 오른손 엄지와 검지를 맞댑니다. (더블 클릭 지원) |
+| **오른쪽 클릭** | 약지 핀치 | 오른손 엄지와 약지를 맞댑니다. |
+| **스크롤** | 중지 핀치 | 오른손 엄지와 중지를 맞댄 상태에서 위아래로 움직입니다. |
+| **확대/축소** | 양손 핀치 | **양손**의 엄지와 검지를 각각 맞댄 후 서로 멀리하거나 가깝게 움직입니다. |
+| **볼륨 조절** | 왼손 핀치 | 왼손 엄지와 검지를 맞댄 상태에서 위아래로 움직입니다. |
 
-## 💼 Productivity Gestures (Right Hand)
+## 💼 생산성 제스처 (오른손/왼손)
 
-| Action | Gesture | Description |
+| 동작 | 제스처 | 설명 |
 | :--- | :--- | :--- |
-| **Switch Desktop** | Open Palm Swipe | Extend all 4 fingers and swipe horizontally. |
-| **Snap Window** | Fist Swipe | Close your hand into a fist and swipe horizontally. |
+| **데스크탑 전환** | 보자기 스와이프 | 네 손가락을 모두 펴고 좌우로 빠르게 움직입니다. |
+| **창 스냅** | 주먹 스와이프 | 주먹을 쥐고 좌우로 빠르게 움직입니다. (Win + 좌/우) |
+| **바탕화면 보기** | 손등 주먹 | 손등이 보이게 돌린 후 주먹을 쥐어 Win+D를 토글합니다. |
+| **작업 보기** | 주먹 올리기 | 오른손 주먹을 쥔 채로 위로 들어올립니다. (Win + Tab) |
+| **창/탭 닫기** | 가위질 | 검지와 중지를 가위처럼 벌렸다가 빠르게 오므립니다. (Ctrl + W) |
+| **브라우저 탐색** | 왼손 검지 핀치 | 왼손 검지 핀치 후 좌우로 이동합니다. (Alt + 좌/우) |
+| **재생/일시정지** | 왼손 주먹 | 왼손 주먹을 쥐었다 펴서 미디어를 제어합니다. |
+| **밝기 조절** | 왼손 약지 핀치 | 왼손 약지 핀치 후 위아래로 움직입니다. |
+| **스크린샷** | 양손 사각형 | 양손의 엄지와 검지로 사각형 모양을 만듭니다. (Win+Shift+S) |
 
-## 🎹 Rhythm Mode (Gaming)
+## 🎹 리듬 모드 (게이밍)
 
-*Toggle Mode: Hold Left Thumb + Pinky pinch for 1 second.*
+*모드 전환: 왼손 엄지와 새끼손가락을 1초간 맞대고 계세요.*
 
-| Key | Finger (Left Hand) | Finger (Right Hand) |
+| 키 | 손가락 (왼손) | 손가락 (오른손) |
 | :--- | :--- | :--- |
-| **W** | Middle Finger Bend | - |
-| **D** | Index Finger Bend | - |
-| **K** | - | Index Finger Bend |
-| **P** | - | Middle Finger Bend |
+| **W** | 중지 구부리기 | - |
+| **D** | 검지 구부리기 | - |
+| **K** | - | 검지 구부리기 |
+| **P** | - | 중지 구부리기 |
 
-> **Tip**: In Rhythm Mode, the cursor is locked to prevent accidental clicks while gaming.
+> **팁**: 리듬 모드에서는 게임 중 실수로 클릭되는 것을 방지하기 위해 커서가 고정됩니다.

@@ -1,41 +1,46 @@
 # GesturePilot-C
 
-GesturePilot-C is a high-performance, low-latency gesture control system that translates hand movements into mouse and keyboard inputs. It features a hybrid architecture with a Python-based MediaPipe tracker and a C-based input injector for maximum responsiveness.
+GesturePilot-C는 손동작을 마우스 및 키보드 입력으로 변환하는 고성능, 저지연 제스처 제어 시스템입니다. Python 기반의 MediaPipe 트래커와 C 기반의 입력 인젝터를 결합한 하이브리드 아키텍처를 통해 최상의 반응성을 제공합니다.
 
-## ✨ Key Features
+## ✨ 주요 기능
 
-- **High Responsiveness**: Optimized C core for minimal input lag.
-- **Precision Tracking**: MediaPipe-powered hand tracking with gaze-assisted stability.
-- **Productivity Gestures**:
-  - **Virtual Desktop Switch**: 4-finger swipe (Left/Right) to switch Windows desktops.
-  - **Window Snapping**: Fist swipe (Left/Right) to snap windows to screen edges.
-- **Rhythm Game Mode**: Ultra-low latency mode specifically tuned for rhythm games like *A Dance of Fire and Ice*.
-- **Intuitive Controls**:
-  - Left/Right click via pinching.
-  - Scrolling with middle finger pinch.
-  - Volume control with left hand vertical movement.
-  - Two-handed zoom support.
+- **초저지연 반응성**: 최소한의 입력 지연을 위해 최적화된 C 언어 코어 사용.
+- **정밀한 추적**: MediaPipe 기반의 손 추적 및 시선 보정(Gaze-assisted) 안정화 기술 적용.
+- **생산성 제스처**:
+  - **가상 데스크탑 전환**: 4손가락 스와이프(좌/우)로 윈도우 데스크탑 전환.
+  - **창 스냅**: 주먹 스와이프(좌/우)로 창을 화면 모서리에 고정.
+  - **바탕화면 보기 (Win+D)**: 손등을 보인 상태에서 주먹을 쥐어 토글.
+  - **작업 보기 (Win+Tab)**: 주먹을 쥔 채 위로 들어올리기.
+  - **창/탭 닫기 (Ctrl+W)**: 검지와 중지를 사용한 가위질 동작.
+  - **브라우저 탐색**: 왼손 검지 핀치 후 좌우 이동으로 앞/뒤로 가기.
+- **미디어 제어**:
+  - **재생/일시정지**: 왼손 주먹 쥐기.
+  - **볼륨 조절**: 왼손 검지 핀치 후 상하 이동.
+  - **밝기 조절**: 왼손 약지 핀치 후 상하 이동.
+- **스크린샷**: 양손 엄지와 검지로 사각형 만들기 (Win+Shift+S).
+- **리듬 게임 모드**: *불과 얼음의 춤(ADOFAI)* 등 리듬 게임에 최적화된 초저지연 모드 제공.
+- **적응형 필터링**: 적응형 EMA 필터와 데드존(Dead-zone) 적용으로 얼굴 근처에서도 떨림 없는 마우스 조작 가능.
 
-## 🚀 Getting Started
+## 🚀 시작하기
 
-### Prerequisites
+### 사전 요구 사항
 - Windows 10/11
-- Webcam
-- CMake (for building the C core)
-- Python 3.10+
+- 웹캠
+- CMake (C 코어 빌드용)
+- Python 3.10 이상
 
-### Installation & Execution
-Simply run the included batch file to set up the environment and start the application:
+### 설치 및 실행
+동봉된 배치 파일을 실행하면 환경 설정 및 애플리케이션이 자동으로 시작됩니다:
 ```batch
 run_gesture_pilot.bat
 ```
 
-## 🛠 Configuration
+## 🛠 설정
 
-You can fine-tune the behavior in `config/gesturepilot.sample.ini` (rename to `gesturepilot.ini`):
-- `confidence_threshold`: Adjust detection sensitivity.
-- `stable_frames`: Number of frames to confirm a gesture.
-- `model_path`: Path to the ONNX inference model.
+`config/gesturepilot.sample.ini` 파일의 이름을 `gesturepilot.ini`로 변경하여 상세 동작을 설정할 수 있습니다:
+- `confidence_threshold`: 인식 민감도 조절.
+- `stable_frames`: 제스처 확정을 위한 프레임 수.
+- `model_path`: ONNX 추론 모델 경로.
 
-## 📜 License
-This project is licensed under the MIT License.
+## 📜 라이선스
+이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다.

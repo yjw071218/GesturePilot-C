@@ -1,32 +1,33 @@
-# Project Architecture
+# 프로젝트 아키텍처
 
-GesturePilot-C employs a **Hybrid Multi-Process Architecture** to balance the ease of high-level computer vision in Python with the low-latency input execution of C.
+GesturePilot-C는 Python의 고수준 컴퓨터 비전 편의성과 C 언어의 저지연 입력 실행 능력을 결합한 **하이브리드 멀티 프로세스 아키텍처**를 사용합니다.
 
-## 🏗 System Overview
+## 🏗 시스템 개요
 
-The system consists of two primary components communicating via standard I/O pipes:
+시스템은 표준 I/O 파이프를 통해 통신하는 두 개의 주요 구성 요소로 이루어져 있습니다:
 
-1.  **The Tracker (Python + MediaPipe)**:
-    - Captures video frames from the webcam.
-    - Uses MediaPipe to extract 21 hand landmarks and 478 face landmarks.
-    - Processes high-level gesture logic (swipes, pinches, mode toggles).
-    - Maps 3D hand coordinates to 2D screen coordinates using gaze assistance.
-    - Sends raw command strings to the Injector via `stdout`.
+1.  **트래커 (Python + MediaPipe)**:
+    - 웹캠으로부터 비디오 프레임을 캡처합니다.
+    - MediaPipe를 사용하여 21개의 손 랜드마크와 478개의 얼굴 랜드마크를 추출합니다.
+    - 고수준 제스처 로직(스와이프, 핀치, 모드 전환 등)을 처리합니다.
+    - 시선 보정 데이터를 결합하여 3D 손 좌표를 2D 화면 좌표로 매핑합니다.
+    - 생성된 명령 문자열을 `stdout`을 통해 인젝터로 전송합니다.
 
-2.  **The Injector (C + Windows API)**:
-    - Receives command strings via `stdin`.
-    - Implements **Exponential Moving Average (EMA) Smoothing** to filter jitter.
-    - Executes hardware-level mouse and keyboard events using the `SendInput` Windows API.
-    - Ensures minimal overhead and zero-lag execution.
+2.  **인젝터 (C + Windows API)**:
+    - `stdin`을 통해 명령 문자열을 수신합니다.
+    - **적응형 EMA(Exponential Moving Average) 필터링**을 구현하여 떨림을 제거합니다.
+    - `SendInput` Windows API를 사용하여 하드웨어 수준의 마우스 및 키보드 이벤트를 실행합니다.
+    - 최소한의 오버헤드와 지연 없는 실행을 보장합니다.
 
-## 🔄 Data Flow
+## 🔄 데이터 흐름
 
 ```
-[Webcam] -> (OpenCV) -> [Python Tracker] -> (Pipe) -> [C Injector] -> (WinAPI) -> [OS Input]
+[웹캠] -> (OpenCV) -> [Python 트래커] -> (파이프) -> [C 인젝터] -> (WinAPI) -> [OS 입력]
 ```
 
-## 🚀 Performance Optimizations
+## 🚀 성능 최적화
 
-- **C-Side Smoothing**: Performing smoothing at the injection layer ensures that the cursor moves at the monitor's refresh rate, even if the tracking frame rate varies.
-- **Gaze-Assisted Mapping**: Combines hand position (70%) with eye gaze (30%) to reduce the physical reach required to hit screen corners.
-- **Velocity Detection**: Rhythm mode uses finger bending velocity to trigger keys instantly, bypassing traditional threshold lag.
+- **C-사이드 스무딩**: 입력 레이어에서 직접 필터링을 수행하여 트래킹 프레임 레이트가 변하더라도 커서가 모니터 주사율에 맞춰 매끄럽게 움직이도록 보장합니다.
+- **시선 보정 매핑**: 손 위치(70%)와 눈의 시선(30%)을 결합하여 화면 구석까지 움직이기 위해 필요한 물리적인 손 이동 거리를 단축시킵니다.
+- **속도 기반 감지**: 리듬 모드에서는 손가락이 구부러지는 속도(Velocity)를 계산하여 임계값 도달 전 즉시 키를 트리거함으로써 지연 시간을 최소화합니다.
+- **적응형 EMA 필터**: 정지 상태에서는 필터를 강화하고 이동 중에는 반응성을 높여 얼굴 앞에서의 간섭과 미세 떨림을 완벽히 억제합니다.
