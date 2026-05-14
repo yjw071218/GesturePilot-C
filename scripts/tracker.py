@@ -3,6 +3,7 @@ import mediapipe as mp
 import math
 import time
 import screen_brightness_control as sbc
+import pygetwindow as gw
 from pynput.mouse import Button, Controller as MouseController
 from pynput.keyboard import Key, Controller as KeyboardController
 
@@ -88,6 +89,7 @@ def main():
     
     # New Gesture States
     was_task_view_fist = False
+    was_maximize_fist = False
     last_left_horizontal_pinch_pos = None
     last_left_brightness_pinch_pos = None
     was_media_fist = False
@@ -417,7 +419,27 @@ def main():
                                 last_gesture_msg, last_gesture_msg_time = "TASK VIEW", time.time()
                         else: was_task_view_fist = False
 
-                    # 3. Ctrl+W (가위질: 검지와 중지 벌렸다가 오므리기)
+                    # 3. 창 최대화/복구 (주먹 쥐고 아래로)
+                    if not is_palm_away_right:
+                        is_fist = fingers_ext == 0
+                        wrist_y = r_lms[0].y
+                        if is_fist:
+                            if not was_maximize_fist and wrist_y > 0.7:
+                                try:
+                                    active_win = gw.getActiveWindow()
+                                    if active_win:
+                                        if active_win.isMaximized:
+                                            with keyboard.pressed(Key.cmd): keyboard.tap(Key.down)
+                                            last_gesture_msg = "RESTORE"
+                                        else:
+                                            with keyboard.pressed(Key.cmd): keyboard.tap(Key.up)
+                                            last_gesture_msg = "MAXIMIZE"
+                                        last_gesture_msg_time = time.time()
+                                except: pass
+                                was_maximize_fist = True
+                        else: was_maximize_fist = False
+
+                    # 4. Ctrl+W (가위질: 검지와 중지 벌렸다가 오므리기)
                     if not is_palm_away_right:
                         # 검지와 중지만 펴져 있는 상태 확인
                         is_index_ext = is_finger_extended(r_lms, 8, 6)
