@@ -24,17 +24,17 @@ def main():
     mp_drawing_styles = mp.solutions.drawing_styles
 
     # MediaPipe Hands 객체를 생성하는 헬퍼 함수 (모드 전환 시 복잡도 조절용)
-    def create_hands(complexity):
+    def create_hands(complexity, conf=0.8):
         return mp_hands.Hands(
             static_image_mode=False,
             max_num_hands=2,
-            min_detection_confidence=0.8, # 더욱 강화 (0.7 -> 0.8)
-            min_tracking_confidence=0.8,  # 더욱 강화 (0.7 -> 0.8)
+            min_detection_confidence=conf, 
+            min_tracking_confidence=conf,
             model_complexity=complexity
         )
 
     # 기본적으로 일반 모드용 높은 정확도 모델(1)로 시작
-    hands = create_hands(1) 
+    hands = create_hands(1, 0.8) 
 
     face_mesh = mp_face_mesh.FaceMesh(
         max_num_faces=1,
@@ -108,12 +108,12 @@ def main():
     last_finger_ratios = {'w': 1.0, 'd': 1.0, 'k': 1.0, 'p': 1.0}
     
     # 홀드 내성: 키가 눌린 상태에서는 더 둔감하게 판정하여 끊김 방지
-    HOLD_SENSITIVITY_MULTIPLIER = 1.30 
+    HOLD_SENSITIVITY_MULTIPLIER = 1.60 # 2.2 -> 1.60 (더 빡빡한 릴리스 판정)
     
     # 리듬 모드 초저지연 최소 시간 설정
-    MIN_KEY_HOLD_TIME = 0.050 
-    MIN_KEY_RELEASE_TIME = 0.015
-    RELEASE_DEBOUNCE_TIME = 0.050 # 홀드 타일 노이즈 방어용 유예 시간
+    MIN_KEY_HOLD_TIME = 0.015 
+    MIN_KEY_RELEASE_TIME = 0.010 
+    RELEASE_DEBOUNCE_TIME = 0.050 # 0.180 -> 0.050 (즉각적인 릴리스 반응성 확보)
 
     # 얼굴 랜드마크를 기반으로 시선 지점을 계산하는 함수
     def get_gaze_point(face_landmarks):
@@ -236,10 +236,26 @@ def main():
                 
                 # 리듬 키 감지
                 if rhythm_mode:
-                    ratio_w = get_dist(l_lms[12], l_lms[9]) / (get_dist(l_lms[10], l_lms[9]) + 1e-6)
-                    ratio_d = get_dist(l_lms[8], l_lms[5]) / (get_dist(l_lms[6], l_lms[5]) + 1e-6)
-                    detected_keys_this_frame['w'] = (ratio_w < 0.88 * (HOLD_SENSITIVITY_MULTIPLIER if key_states['w'] else 1.0))
-                    detected_keys_this_frame['d'] = (ratio_d < 0.88 * (HOLD_SENSITIVITY_MULTIPLIER if key_states['d'] else 1.0))
+                    def get_finger_state(lms, tip, mcp, pip):
+                        base_dist = get_dist(lms[mcp], lms[pip]) + 1e-6
+                        tip_dist = get_dist(lms[mcp], lms[tip])
+                        return tip_dist / base_dist
+
+                    # 왼손 (W: 중지, D: 검지)
+                    ratio_w = get_finger_state(l_lms, 12, 9, 10)
+                    ratio_d = get_finger_state(l_lms, 8, 5, 6)
+                    
+                    vel_w = last_finger_ratios['w'] - ratio_w
+                    vel_d = last_finger_ratios['d'] - ratio_d
+                    
+                    w_mult = HOLD_SENSITIVITY_MULTIPLIER if key_states['w'] else 1.0
+                    d_mult = HOLD_SENSITIVITY_MULTIPLIER if key_states['d'] else 1.0
+                    
+                    # 눌리는 판정 완화: 임계값 0.95 -> 0.97, 속도 0.08 -> 0.06
+                    detected_keys_this_frame['w'] = (ratio_w < 0.97 * w_mult) or (vel_w > 0.06)
+                    detected_keys_this_frame['d'] = (ratio_d < 0.97 * d_mult) or (vel_d > 0.06)
+                    
+                    last_finger_ratios['w'], last_finger_ratios['d'] = ratio_w, ratio_d
                 else:
                     if not is_palm_away_left:
                         # 브라우저 앞/뒤 (검지 핀치 좌우)
@@ -295,10 +311,25 @@ def main():
             if right_idx != -1 and not (two_hand_zoom_active or screenshot_rectangle_active):
                 r_lms = hand_results.multi_hand_landmarks[right_idx].landmark
                 if rhythm_mode:
-                    ratio_k = get_dist(r_lms[8], r_lms[5]) / (get_dist(r_lms[6], r_lms[5]) + 1e-6)
-                    ratio_p = get_dist(r_lms[12], r_lms[9]) / (get_dist(r_lms[10], r_lms[9]) + 1e-6)
-                    detected_keys_this_frame['k'] = (ratio_k < 0.88 * (HOLD_SENSITIVITY_MULTIPLIER if key_states['k'] else 1.0))
-                    detected_keys_this_frame['p'] = (ratio_p < 0.88 * (HOLD_SENSITIVITY_MULTIPLIER if key_states['p'] else 1.0))
+                    # 오른손 (K: 검지, P: 중지)
+                    def get_finger_state(lms, tip, mcp, pip):
+                        base_dist = get_dist(lms[mcp], lms[pip]) + 1e-6
+                        tip_dist = get_dist(lms[mcp], lms[tip])
+                        return tip_dist / base_dist
+
+                    ratio_k = get_finger_state(r_lms, 8, 5, 6)
+                    ratio_p = get_finger_state(r_lms, 12, 9, 10)
+                    
+                    vel_k = last_finger_ratios['k'] - ratio_k
+                    vel_p = last_finger_ratios['p'] - ratio_p
+                    
+                    k_mult = HOLD_SENSITIVITY_MULTIPLIER if key_states['k'] else 1.0
+                    p_mult = HOLD_SENSITIVITY_MULTIPLIER if key_states['p'] else 1.0
+                    
+                    detected_keys_this_frame['k'] = (ratio_k < 0.95 * k_mult) or (vel_k > 0.08)
+                    detected_keys_this_frame['p'] = (ratio_p < 0.95 * p_mult) or (vel_p > 0.08)
+                    
+                    last_finger_ratios['k'], last_finger_ratios['p'] = ratio_k, ratio_p
                 else:
                     if not is_palm_away_right:
                         # 일반 마우스 동작 (엄지와 검지/중지/약지 핀치)
@@ -484,6 +515,12 @@ def main():
 
         cv2.imshow('GesturePilot', image)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    main()
 
     cap.release()
     cv2.destroyAllWindows()
