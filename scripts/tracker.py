@@ -320,8 +320,8 @@ def main():
                     is_other_v_closed = not (is_finger_extended(l_lms, 16, 14) or is_finger_extended(l_lms, 20, 18))
                     
                     if is_other_v_closed:
-                        # 굽힘 판정 (임계값 0.8)
-                        if r_idx_v < 0.8 and r_mid_v < 0.8:
+                        # 굽힘 판정 (임계값 0.88로 완화 - 더 살짝만 굽혀도 됨)
+                        if r_idx_v < 0.88 and r_mid_v < 0.88:
                             was_v_bent = True
                         # 펴짐 판정 (임계값 0.95)
                         elif r_idx_v > 0.95 and r_mid_v > 0.95 and was_v_bent:
