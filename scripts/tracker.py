@@ -311,20 +311,23 @@ def main():
                             was_media_fist = False
 
                     # V-Sign (검지와 중지만 활성화) - 손가락을 굽혔다 펴면 동작
-                    # 검지와 중지의 굽힘 정도를 헬퍼로 확인
+                    # 딱 위의 한마디(끝마디)만 굽혀도 되도록 비율 계산 방식 변경
                     def get_f_ratio(lms, tip, mcp, pip):
-                        return get_dist(lms[mcp], lms[tip]) / (get_dist(lms[mcp], lms[pip]) + 1e-6)
+                        # PIP-TIP 거리 대비 MCP-PIP 거리 비율 (끝마디 굽힘 강조)
+                        upper_joint = get_dist(lms[pip], lms[tip])
+                        lower_joint = get_dist(lms[mcp], lms[pip]) + 1e-6
+                        return upper_joint / lower_joint
                     
                     r_idx_v = get_f_ratio(l_lms, 8, 5, 6)
                     r_mid_v = get_f_ratio(l_lms, 12, 9, 10)
                     is_other_v_closed = not (is_finger_extended(l_lms, 16, 14) or is_finger_extended(l_lms, 20, 18))
                     
                     if is_other_v_closed:
-                        # 굽힘 판정 (임계값 0.88로 완화 - 더 살짝만 굽혀도 됨)
-                        if r_idx_v < 0.88 and r_mid_v < 0.88:
+                        # 굽힘 판정 (임계값 0.93으로 대폭 완화 - 끝마디만 아주 살짝 굽혀도 됨)
+                        if r_idx_v < 0.93 and r_mid_v < 0.93:
                             was_v_bent = True
-                        # 펴짐 판정 (임계값 0.95)
-                        elif r_idx_v > 0.95 and r_mid_v > 0.95 and was_v_bent:
+                        # 펴짐 판정 (임계값 0.96)
+                        elif r_idx_v > 0.96 and r_mid_v > 0.96 and was_v_bent:
                             if not is_palm_away_left: # 정방향: 붙여넣기
                                 with keyboard.pressed(Key.ctrl): keyboard.tap('v')
                                 last_gesture_msg, last_gesture_msg_time = "PASTE (Ctrl+V)", time.time()
