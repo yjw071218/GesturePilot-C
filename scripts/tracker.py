@@ -259,7 +259,7 @@ def main():
                 else:
                     if not is_palm_away_left:
                         # 브라우저 앞/뒤 (검지 핀치 좌우)
-                        if get_dist(l_lms[4], l_lms[8]) < 0.05:
+                        if get_dist(l_lms[4], l_lms[8]) < 0.06:
                             curr_h = (l_lms[4].x+l_lms[8].x)/2, (l_lms[4].y+l_lms[8].y)/2
                             if last_left_horizontal_pinch_pos:
                                 dx_h = curr_h[0] - last_left_horizontal_pinch_pos[0]
@@ -272,7 +272,7 @@ def main():
                         else: last_left_horizontal_pinch_pos = None
 
                         # 볼륨 조절 (검지 핀치 상하)
-                        if get_dist(l_lms[4], l_lms[8]) < 0.05:
+                        if get_dist(l_lms[4], l_lms[8]) < 0.06:
                             curr = (l_lms[4].x+l_lms[8].x)/2, (l_lms[4].y+l_lms[8].y)/2
                             if last_left_pinch_pos:
                                 dy = curr[1]-last_left_pinch_pos[1]
@@ -284,7 +284,7 @@ def main():
                         else: last_left_pinch_pos = None
 
                         # 화면 밝기 조절 (약지 핀치 상하)
-                        if get_dist(l_lms[4], l_lms[16]) < 0.05:
+                        if get_dist(l_lms[4], l_lms[16]) < 0.06:
                             curr_b = (l_lms[4].x+l_lms[16].x)/2, (l_lms[4].y+l_lms[16].y)/2
                             if last_left_brightness_pinch_pos:
                                 dy_b = curr_b[1] - last_left_brightness_pinch_pos[1]
@@ -307,6 +307,14 @@ def main():
                         elif not is_l_fist and was_media_fist:
                             was_media_fist = False
 
+            if left_idx == -1:
+                last_left_pinch_pos = None
+                last_left_brightness_pinch_pos = None
+                last_left_horizontal_pinch_pos = None
+                was_media_fist = False
+                was_v_paste = False
+                was_v_copy = False
+
             # --- 오른손 처리 ---
             if right_idx != -1 and not (two_hand_zoom_active or screenshot_rectangle_active):
                 r_lms = hand_results.multi_hand_landmarks[right_idx].landmark
@@ -326,8 +334,9 @@ def main():
                     k_mult = HOLD_SENSITIVITY_MULTIPLIER if key_states['k'] else 1.0
                     p_mult = HOLD_SENSITIVITY_MULTIPLIER if key_states['p'] else 1.0
                     
-                    detected_keys_this_frame['k'] = (ratio_k < 0.95 * k_mult) or (vel_k > 0.08)
-                    detected_keys_this_frame['p'] = (ratio_p < 0.95 * p_mult) or (vel_p > 0.08)
+                    # 눌리는 판정 완화: 임계값 0.95 -> 0.97, 속도 0.08 -> 0.06
+                    detected_keys_this_frame['k'] = (ratio_k < 0.97 * k_mult) or (vel_k > 0.06)
+                    detected_keys_this_frame['p'] = (ratio_p < 0.97 * p_mult) or (vel_p > 0.08)
                     
                     last_finger_ratios['k'], last_finger_ratios['p'] = ratio_k, ratio_p
                 else:
@@ -337,7 +346,7 @@ def main():
                         
                         # 더블 클릭을 돕기 위해, 최근에 클릭을 뗐다면 인식 범위를 일시적으로 확장
                         is_near_recent_click = (time.time() - last_left_click_release_time < DOUBLE_CLICK_THRESHOLD)
-                        T, R = (0.05, 0.07) if is_near_recent_click else (0.04, 0.06)
+                        T, R = (0.06, 0.08) if is_near_recent_click else (0.06, 0.12)
 
                         if active_pinch_type == "L":
                             if d_idx < R: current_pinch = "L"
@@ -521,6 +530,22 @@ def main():
 
 if __name__ == "__main__":
     main()
+  active_pinch_type = current_pinch
+        ui_text = f"MODE: {'RHYTHM' if rhythm_mode else 'NORMAL'}"
+        if two_hand_zoom_active: ui_text += " [ZOOMING]"
+        if screenshot_rectangle_active: ui_text += " [SCREENSHOT]"
+        cv2.putText(image, ui_text, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+        
+        # 제스처 시각화 피드백
+        if time.time() - last_gesture_msg_time < 1.5:
+            cv2.putText(image, f"ACTION: {last_gesture_msg}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 255), 3)
+
+        if rhythm_mode:
+            active_keys_str = " ".join([k.upper() for k, v in key_states.items() if v])
+            if active_keys_str: cv2.putText(image, f"KEYS: {active_keys_str}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+        cv2.imshow('GesturePilot', image)
+        if cv2.waitKey(1) & 0xFF == ord('q'): break
 
     cap.release()
     cv2.destroyAllWindows()
