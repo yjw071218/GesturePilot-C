@@ -97,6 +97,9 @@ def main():
     # Scissors States
     was_scissors_open = False
     last_scissors_time = 0
+    
+    # Left Hand V-Sign States
+    was_v_bent = False
 
     # 키 관리: 현재 실시간 상태 및 시간 기록
     key_states = {'w': False, 'd': False, 'k': False, 'p': False}
@@ -307,13 +310,37 @@ def main():
                         elif not is_l_fist and was_media_fist:
                             was_media_fist = False
 
+                    # V-Sign (검지와 중지만 활성화) - 손가락을 굽혔다 펴면 동작
+                    # 검지와 중지의 굽힘 정도를 헬퍼로 확인
+                    def get_f_ratio(lms, tip, mcp, pip):
+                        return get_dist(lms[mcp], lms[tip]) / (get_dist(lms[mcp], lms[pip]) + 1e-6)
+                    
+                    r_idx_v = get_f_ratio(l_lms, 8, 5, 6)
+                    r_mid_v = get_f_ratio(l_lms, 12, 9, 10)
+                    is_other_v_closed = not (is_finger_extended(l_lms, 16, 14) or is_finger_extended(l_lms, 20, 18))
+                    
+                    if is_other_v_closed:
+                        # 굽힘 판정 (임계값 0.8)
+                        if r_idx_v < 0.8 and r_mid_v < 0.8:
+                            was_v_bent = True
+                        # 펴짐 판정 (임계값 0.95)
+                        elif r_idx_v > 0.95 and r_mid_v > 0.95 and was_v_bent:
+                            if not is_palm_away_left: # 정방향: 붙여넣기
+                                with keyboard.pressed(Key.ctrl): keyboard.tap('v')
+                                last_gesture_msg, last_gesture_msg_time = "PASTE (Ctrl+V)", time.time()
+                            else: # 뒤집힌 상태: 복사
+                                with keyboard.pressed(Key.ctrl): keyboard.tap('c')
+                                last_gesture_msg, last_gesture_msg_time = "COPY (Ctrl+C)", time.time()
+                            was_v_bent = False
+                    else:
+                        was_v_bent = False
+
             if left_idx == -1:
                 last_left_pinch_pos = None
                 last_left_brightness_pinch_pos = None
                 last_left_horizontal_pinch_pos = None
                 was_media_fist = False
-                was_v_paste = False
-                was_v_copy = False
+                was_v_bent = False
 
             # --- 오른손 처리 ---
             if right_idx != -1 and not (two_hand_zoom_active or screenshot_rectangle_active):
@@ -509,28 +536,6 @@ def main():
             print(f"none 1.0 0.5 0.5 16 0 0", flush=True)
 
         active_pinch_type = current_pinch
-        ui_text = f"MODE: {'RHYTHM' if rhythm_mode else 'NORMAL'}"
-        if two_hand_zoom_active: ui_text += " [ZOOMING]"
-        if screenshot_rectangle_active: ui_text += " [SCREENSHOT]"
-        cv2.putText(image, ui_text, (10, 35), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
-        
-        # 제스처 시각화 피드백
-        if time.time() - last_gesture_msg_time < 1.5:
-            cv2.putText(image, f"ACTION: {last_gesture_msg}", (10, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (255, 0, 255), 3)
-
-        if rhythm_mode:
-            active_keys_str = " ".join([k.upper() for k, v in key_states.items() if v])
-            if active_keys_str: cv2.putText(image, f"KEYS: {active_keys_str}", (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-
-        cv2.imshow('GesturePilot', image)
-        if cv2.waitKey(1) & 0xFF == ord('q'): break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-if __name__ == "__main__":
-    main()
-  active_pinch_type = current_pinch
         ui_text = f"MODE: {'RHYTHM' if rhythm_mode else 'NORMAL'}"
         if two_hand_zoom_active: ui_text += " [ZOOMING]"
         if screenshot_rectangle_active: ui_text += " [SCREENSHOT]"
