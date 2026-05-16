@@ -1,4 +1,12 @@
-// Python tracker 프로세스를 실행하고 예측 라인을 읽는다.
+/**
+ * @file        inference_pipe.c
+ * @brief       Python 추론 프로세스 연동 구현
+ * @details     tracker.py를 실행하고 표준 출력에서 예측 결과를 읽는다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #include "inference.h"
 
 #include <stdio.h>

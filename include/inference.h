@@ -1,4 +1,12 @@
-// 파이썬 추론 프로세스와 C 코어를 잇는 입출력 인터페이스다.
+/**
+ * @file        inference.h
+ * @brief       Python 추론 프로세스 연동 인터페이스
+ * @details     tracker.py 프로세스를 실행하고 예측 결과를 읽어오는 기능을 정의한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #pragma once
 
 #include "gesture_types.h"

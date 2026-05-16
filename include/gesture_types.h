@@ -1,4 +1,12 @@
-// 손동작, 시스템 액션, 추론 결과를 공유하는 공통 타입 정의다.
+/**
+ * @file        gesture_types.h
+ * @brief       손동작, 액션, 추론 결과의 공통 타입 정의
+ * @details     C 코어와 Python 트래커가 공유하는 열거형과 예측 구조체를 제공한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #pragma once
 
 // 카메라/모델이 인식하는 손동작 종류

@@ -1,4 +1,12 @@
-// Windows API로 마우스와 키보드 입력을 주입한다.
+/**
+ * @file        input_injector_win.c
+ * @brief       Windows 입력 주입 구현
+ * @details     Windows API를 사용해 마우스 이동, 클릭, 키보드 입력을 발생시킨다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #include "input_injector.h"
 
 #include <stdio.h>

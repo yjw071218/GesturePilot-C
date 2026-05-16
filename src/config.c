@@ -1,4 +1,12 @@
-// INI 설정을 읽고 기본 실행값을 채운다.
+/**
+ * @file        config.c
+ * @brief       실행 설정과 INI 파싱 구현
+ * @details     기본 설정값을 채우고 설정 파일을 읽어 앱 전체 동작을 구성한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #include "config.h"
 
 #include <ctype.h>

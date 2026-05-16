@@ -1,4 +1,12 @@
-// 설정 파일과 기본 실행값을 다루는 공용 설정 인터페이스다.
+/**
+ * @file        config.h
+ * @brief       실행 설정과 INI 파싱 인터페이스
+ * @details     기본값 초기화와 설정 파일 로드를 담당한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #pragma once
 
 #include <stddef.h>

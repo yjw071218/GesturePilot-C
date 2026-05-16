@@ -1,4 +1,12 @@
-// 추론 결과를 Windows 입력 이벤트로 바꾸는 인터페이스다.
+/**
+ * @file        input_injector.h
+ * @brief       Windows 입력 주입 인터페이스
+ * @details     제스처 판정 결과를 마우스와 키보드 입력 이벤트로 변환한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #pragma once
 
 #include "gesture_types.h"

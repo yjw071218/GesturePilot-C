@@ -1,4 +1,12 @@
-// C 코어는 Python 추론 결과를 받아 시스템 입력만 주입하는 실행 진입점이다.
+/**
+ * @file        main.c
+ * @brief       GesturePilot-C 메인 프로그램
+ * @details     Python 추론 결과를 받아 시스템 입력 주입 루프를 실행한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #include "action_mapper.h"
 #include "config.h"
 #include "inference.h"

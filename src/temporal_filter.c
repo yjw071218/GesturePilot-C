@@ -1,4 +1,12 @@
-// 연속 예측을 누적해 안정적인 제스처만 내보낸다.
+/**
+ * @file        temporal_filter.c
+ * @brief       연속 예측 안정화 구현
+ * @details     최근 예측 히스토리를 분석해 안정된 제스처만 전달한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #include "temporal_filter.h"
 
 #include <string.h>

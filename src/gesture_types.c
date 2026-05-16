@@ -1,4 +1,12 @@
-// 문자열과 열거형 사이를 변환하는 공통 헬퍼다.
+/**
+ * @file        gesture_types.c
+ * @brief       손동작과 액션 문자열 변환 구현
+ * @details     열거형 값을 사람이 읽을 수 있는 문자열과 상호 변환한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #include "gesture_types.h"
 
 #include <ctype.h>

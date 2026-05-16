@@ -1,4 +1,12 @@
-// 연속된 예측을 안정화하는 시간 필터 구조와 API다.
+/**
+ * @file        temporal_filter.h
+ * @brief       연속 예측 안정화용 시간 필터 인터페이스
+ * @details     안정 프레임과 쿨다운을 사용해 제스처 흔들림을 줄인다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #pragma once
 
 #include <stddef.h>

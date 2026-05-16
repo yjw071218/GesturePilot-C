@@ -1,5 +1,12 @@
-# Python tracker는 카메라 프레임에서 손동작을 해석해 C 코어로 보낸다.
-# 이 파일은 제스처 판단과 상태 추적의 중심이다.
+"""
+@file        tracker.py
+@brief       손동작 추적 및 추론 브리지
+@details     카메라 프레임에서 손동작을 해석하고 C 코어로 전달한다.
+@author      유정우 (yjw071218@korea.ac.kr)
+@version     1.2.0
+@date        2026-05-17
+@copyright   Copyright (c) 2026 Company Name. All rights reserved.
+"""
 import cv2
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel

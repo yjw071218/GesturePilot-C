@@ -1,4 +1,12 @@
-// 제스처 설정을 실제 실행 액션으로 연결하는 매핑 인터페이스다.
+/**
+ * @file        action_mapper.h
+ * @brief       제스처를 실행 액션으로 매핑하는 인터페이스
+ * @details     설정에 저장된 제스처-액션 바인딩을 실제 실행 액션으로 해석한다.
+ * @author      유정우 (yjw071218@korea.ac.kr)
+ * @version     1.2.0
+ * @date        2026-05-17
+ * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ */
 #pragma once
 
 #include "config.h"
