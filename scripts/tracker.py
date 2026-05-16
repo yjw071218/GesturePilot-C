@@ -100,7 +100,8 @@ class TrackerThread(QThread):
         mp_drawing = mp.solutions.drawing_utils
         mp_drawing_styles = mp.solutions.drawing_styles
 
-        # MediaPipe Hands 객체를 생성함 (인식률 및 추적률 설정 가능)
+        # 미디어파이프 손 추적 객체를 생성함
+        # detection/tracking confidence로 인식 민감도와 추적 안정성을 조절한다.
         def create_hands(complexity=1, det_conf=0.65, track_conf=0.65):
             return mp_hands.Hands(
                 static_image_mode=False,
@@ -270,7 +271,7 @@ class TrackerThread(QThread):
                 curved = smoothstep01(normalized)
                 res = normalized * (1.0 - edge_precision) + curved * edge_precision
             
-            # S-커브 특성상 끝부분이 너무 평탄해져서 모서리에 도달하기 힘든 현상 해결
+            # S-커브 끝부분이 너무 평평해지는 문제를 완화해 경계값에 더 잘 닿게 함
             # 결과값을 중심(0.5) 기준으로 1.10배 확장하여 화면 끝(0.0 및 1.0)에 아주 쉽게 닿도록 함
             res = (res - 0.5) * 1.10 + 0.5
             return max(0.0, min(1.0, res))
@@ -459,7 +460,7 @@ class TrackerThread(QThread):
                         key_hand_present['w'] = True
                         key_hand_present['d'] = True
 
-                        # W키는 중지, D키는 검지
+                        # W키는 중지 손가락, D키는 검지 손가락에 대응함
                         ratio_w = get_finger_state(l_lms, 12, 9, 10)
                         ratio_d = get_finger_state(l_lms, 8, 5, 6)
                         
@@ -983,7 +984,7 @@ class TrackerThread(QThread):
 
             active_pinch_type = current_pinch
             
-            # GUI PIP 기능 (Picture in Picture): 카메라 원본 화면을 좌측 하단에 조그맣게 표시함 (다시 끝에 붙임)
+            # GUI PIP 기능(화면 속 화면): 카메라 원본 화면을 좌측 하단에 작게 표시함
             pip_h, pip_w = int(image.shape[0] * 0.25), int(image.shape[1] * 0.25)
             pip_img = cv2.resize(image, (pip_w, pip_h))
             black_screen[image.shape[0]-pip_h:image.shape[0], 0:pip_w] = pip_img
@@ -1026,7 +1027,7 @@ class TrackerThread(QThread):
             for i, txt in enumerate(debug_texts):
                 cv2.putText(black_screen, txt, (image.shape[1] - 250, 30 + i * 25), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
-            # PyQt5 시그널 전송
+            # 캡처된 프레임을 PyQt5 시그널로 화면에 전달함
             self.change_pixmap_signal.emit(black_screen)
             
             if self.key_pressed == 'q' or not self.running:

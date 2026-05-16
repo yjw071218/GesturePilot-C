@@ -31,8 +31,8 @@ int inference_init(inference_ctx_t* context, const char* model_path) {
         strncpy(context->model_path, model_path, sizeof(context->model_path) - 1);
     }
 
-    // Launch python script
-    // Unbuffered output from python is needed so we pass -u
+    // Python 트래커 프로세스를 실행함
+    // 출력 버퍼링을 막기 위해 -u 옵션을 붙여 즉시 읽을 수 있게 함
     FILE* pipe = POPEN("python -u scripts/tracker.py", "r");
     if (!pipe) {
         fprintf(stderr, "Failed to start python tracker.py\n");
@@ -59,7 +59,8 @@ prediction_t inference_run(inference_ctx_t* context) {
 
     pipe = (FILE*)context->handle;
     if (fgets(line, sizeof(line), pipe) != NULL) {
-        // Format: GESTURE_NAME CONFIDENCE X Y PINCH_MASK SCROLL_DELTA ZOOM_DELTA
+        // 형식: 제스처이름 신뢰도 X Y 핀치마스크 스크롤변화 줌변화
+        // 각 값은 공백으로 구분되어 한 줄에 전달된다.
         if (sscanf(line, "%63s %f %f %f %d %d %d", 
                    gesture_name, &result.confidence, &result.x, &result.y, 
                    &result.pinch_mask, &result.scroll_delta, &result.zoom_delta) == 7) {
@@ -68,10 +69,11 @@ prediction_t inference_run(inference_ctx_t* context) {
                 strncpy(result.key_name, gesture_name + 4, sizeof(result.key_name) - 1);
             }
         } else {
+            // 파싱 형식이 맞지 않으면 아무 제스처도 아닌 것으로 처리함
             result.gesture = GESTURE_NONE;
         }
     } else {
-        // EOF or error
+        // 출력이 끝났거나 읽기 오류가 발생한 경우
         result.gesture = GESTURE_NONE;
         result.confidence = -1.0f;
     }
