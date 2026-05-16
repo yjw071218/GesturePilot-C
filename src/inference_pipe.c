@@ -26,6 +26,7 @@ int inference_init(inference_ctx_t* context, const char* model_path) {
         return 0;
     }
 
+    // 이전 상태가 남지 않도록 컨텍스트를 비우고 모델 경로를 저장한다.
     memset(context, 0, sizeof(*context));
     if (model_path != NULL) {
         strncpy(context->model_path, model_path, sizeof(context->model_path) - 1);
@@ -59,6 +60,7 @@ prediction_t inference_run(inference_ctx_t* context) {
 
     pipe = (FILE*)context->handle;
     if (fgets(line, sizeof(line), pipe) != NULL) {
+        // tracker.py가 한 줄씩 내보낸 예측 문자열을 파싱한다.
         // 형식: 제스처이름 신뢰도 X Y 핀치마스크 스크롤변화 줌변화
         // 각 값은 공백으로 구분되어 한 줄에 전달된다.
         if (sscanf(line, "%63s %f %f %f %d %d %d", 

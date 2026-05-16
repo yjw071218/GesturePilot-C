@@ -12,6 +12,7 @@
 #include <string.h>
 
 static size_t history_index(const temporal_filter_t* filter, size_t reverse_index) {
+    // 원형 버퍼의 최신 값부터 역방향으로 접근하는 위치를 계산한다.
     size_t latest = (filter->cursor + 64 - 1) % 64;
     return (latest + 64 - reverse_index) % 64;
 }
@@ -29,6 +30,7 @@ void temporal_filter_init(temporal_filter_t* filter, int stable_frames, float co
 }
 
 static void push_history(temporal_filter_t* filter, gesture_t gesture) {
+    // 새 예측을 히스토리 버퍼에 넣고 원형 인덱스를 앞으로 이동한다.
     filter->history[filter->cursor] = gesture;
     filter->cursor = (filter->cursor + 1) % 64;
     if (filter->count < 64) {
@@ -40,6 +42,7 @@ static int recent_streak(const temporal_filter_t* filter, gesture_t gesture) {
     size_t reverse_index;
     int streak = 0;
 
+    // 가장 최근 예측이 연속으로 몇 번 반복됐는지 센다.
     for (reverse_index = 0; reverse_index < filter->count; ++reverse_index) {
         size_t index = history_index(filter, reverse_index);
         if (filter->history[index] != gesture) {
@@ -58,12 +61,14 @@ int temporal_filter_update(temporal_filter_t* filter, prediction_t prediction, u
         return 0;
     }
 
+    // 신뢰도가 낮거나 무의미한 예측은 필터에 넣지 않는다.
     if (prediction.gesture == GESTURE_UNKNOWN ||
         prediction.gesture == GESTURE_NONE ||
         prediction.confidence < filter->confidence_threshold) {
         return 0;
     }
 
+    // 연속 안정성 조건을 확인한 뒤 쿨다운까지 통과해야 내보낸다.
     push_history(filter, prediction.gesture);
     streak = recent_streak(filter, prediction.gesture);
     if (streak < filter->stable_frames) {

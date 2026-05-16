@@ -17,6 +17,7 @@
  * 액션 타입을 Windows 가상 키 코드(VK)로 변환하는 정적 함수
  */
 static WORD action_to_vk(action_t action) {
+    // 프로그램 내부 액션을 Windows 가상 키 코드로 바꾼다.
     switch (action) {
         case ACTION_PLAY_PAUSE: return VK_MEDIA_PLAY_PAUSE; // 재생/일시정지
         case ACTION_NEXT_SLIDE: return VK_RIGHT;           // 다음 슬라이드 (오른쪽 화살표)
@@ -37,6 +38,7 @@ static float smoothed_y = 0.5f; // EMA 필터링된 Y 좌표
 void input_injector_update_mouse(float x, float y, int pinch_mask, int scroll_delta, int zoom_delta, int dry_run) {
     if (dry_run) return;
 
+    // 핀치 상태에서 버튼과 고정 여부를 분리해 해석한다.
     // pinch_mask 비트 0: 왼쪽 버튼 눌림 여부
     // pinch_mask 비트 4: Python 측에서 보낸 고정(Freeze) 신호
     int left_now = pinch_mask & 1;
@@ -60,6 +62,7 @@ void input_injector_update_mouse(float x, float y, int pinch_mask, int scroll_de
     smoothed_y = smoothed_y * (1.0f - target_alpha) + y * target_alpha;
 
     if (should_move) {
+        // 보정된 좌표를 실제 화면 이동 좌표로 보낸다.
         // 0.0~1.0 좌표를 Windows 절대 좌표 시스템(0~65535)으로 변환
         int abs_x = (int)(smoothed_x * 65535.0f);
         int abs_y = (int)(smoothed_y * 65535.0f);
@@ -82,6 +85,7 @@ void input_injector_update_mouse(float x, float y, int pinch_mask, int scroll_de
 int input_injector_execute(action_t action, int dry_run) {
     if (action == ACTION_NONE || dry_run) return 1;
     
+    // 오른쪽 클릭은 마우스 다운/업 한 번씩으로 보낸다.
     // 오른쪽 클릭 처리
     if (action == ACTION_CLICK_RIGHT) {
         INPUT inputs[2];
@@ -97,6 +101,7 @@ int input_injector_execute(action_t action, int dry_run) {
     // 기타 키보드 액션 처리
     WORD vk = action_to_vk(action);
     if (vk == 0) return 1;
+    // 미디어 키와 일반 키는 누름/뗌을 연속 전송한다.
     INPUT inputs[2];
     ZeroMemory(inputs, sizeof(inputs));
     inputs[0].type = INPUT_KEYBOARD; inputs[0].ki.wVk = vk;
@@ -110,6 +115,7 @@ int input_injector_execute(action_t action, int dry_run) {
  */
 void input_injector_set_key_state(unsigned short vk, int is_down, int dry_run) {
     if (vk == 0 || dry_run) return;
+    // 특정 키를 강제로 누르거나 떼야 할 때 사용한다.
     INPUT input;
     ZeroMemory(&input, sizeof(input));
     input.type = INPUT_KEYBOARD;
@@ -124,6 +130,7 @@ void input_injector_set_key_state(unsigned short vk, int is_down, int dry_run) {
 void input_injector_type_key(const char* key_name, int dry_run) {
     if (key_name == NULL || *key_name == '\0' || dry_run) return;
     WORD vk = 0;
+    // 단일 문자와 특수 키 이름을 모두 허용한다.
     if (strlen(key_name) == 1) {
         char c = key_name[0];
         if (c >= 'A' && c <= 'Z') vk = c;

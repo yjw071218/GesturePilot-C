@@ -1,6 +1,9 @@
+# 비전/추론에 필요한 패키지
 mediapipe==0.10.14
 opencv-python
+numpy
+
+# 입력/시스템 제어에 필요한 패키지
 pyautogui
 pynput
-numpy
 screen-brightness-control

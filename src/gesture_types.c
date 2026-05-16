@@ -23,6 +23,7 @@ typedef struct named_action_t {
 } named_action_t;
 
 static int text_equals_ignore_case(const char* left, const char* right) {
+    // 대소문자 차이를 무시하고 문자열을 비교한다.
     while (*left != '\0' && *right != '\0') {
         if (tolower((unsigned char)*left) != tolower((unsigned char)*right)) {
             return 0;
@@ -34,6 +35,7 @@ static int text_equals_ignore_case(const char* left, const char* right) {
 }
 
 const char* gesture_to_string(gesture_t gesture) {
+    // 내부 열거형을 로그/설정 파일용 문자열로 바꾼다.
     switch (gesture) {
         case GESTURE_NONE: return "none";
         case GESTURE_FIST: return "fist";
@@ -64,10 +66,12 @@ gesture_t gesture_from_string(const char* text) {
         return GESTURE_UNKNOWN;
     }
 
+    // KEY_ 접두사는 키 입력 제스처로 통합해 처리한다.
     if (strncmp(text, "KEY_", 4) == 0) {
         return GESTURE_KEY;
     }
 
+    // 정의된 이름 표에서 일치하는 값을 찾는다.
     for (index = 0; index < sizeof(map) / sizeof(map[0]); ++index) {
         if (text_equals_ignore_case(text, map[index].name)) {
             return map[index].value;
@@ -78,6 +82,7 @@ gesture_t gesture_from_string(const char* text) {
 }
 
 const char* action_to_string(action_t action) {
+    // 액션 값을 사람이 읽을 수 있는 이름으로 바꾼다.
     switch (action) {
         case ACTION_NONE: return "none";
         case ACTION_PLAY_PAUSE: return "play_pause";
@@ -106,6 +111,7 @@ action_t action_from_string(const char* text) {
         return ACTION_NONE;
     }
 
+    // 설정 파일에 적힌 액션 이름을 대응 열거형으로 변환한다.
     for (index = 0; index < sizeof(map) / sizeof(map[0]); ++index) {
         if (text_equals_ignore_case(text, map[index].name)) {
             return map[index].value;

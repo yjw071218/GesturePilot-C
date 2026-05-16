@@ -16,6 +16,7 @@
 
 static char* trim(char* text) {
     char* end;
+    // 앞뒤 공백을 제거해 설정 키/값 파싱을 안정화한다.
     while (*text != '\0' && isspace((unsigned char)*text)) {
         text++;
     }
@@ -63,6 +64,7 @@ static int parse_int(const char* text, int* out_value) {
     char* end_ptr = NULL;
     long value;
 
+    // 숫자 전체가 유효한 정수인지 확인한다.
     value = strtol(text, &end_ptr, 10);
     if (end_ptr == text || *end_ptr != '\0') {
         return 0;
@@ -76,6 +78,7 @@ static int parse_float(const char* text, float* out_value) {
     char* end_ptr = NULL;
     float value;
 
+    // 소수점 값을 읽고 뒤에 쓰레기 문자가 남지 않았는지 검사한다.
     value = (float)strtod(text, &end_ptr);
     if (end_ptr == text || *end_ptr != '\0') {
         return 0;
@@ -90,6 +93,7 @@ static int set_mapping(app_config_t* config, const char* key, const char* value)
     action_t action;
     size_t index;
 
+    // map.<gesture>=<action> 형식의 항목만 제스처 바인딩으로 해석한다.
     if (strncmp(key, "map.", 4) != 0) {
         return 0;
     }
@@ -100,6 +104,7 @@ static int set_mapping(app_config_t* config, const char* key, const char* value)
         return 0;
     }
 
+    // 이미 같은 제스처가 있으면 기존 바인딩을 갱신한다.
     for (index = 0; index < config->binding_count; ++index) {
         if (config->bindings[index].gesture == gesture) {
             config->bindings[index].action = action;
@@ -111,6 +116,7 @@ static int set_mapping(app_config_t* config, const char* key, const char* value)
         return 0;
     }
 
+    // 아직 없던 제스처는 새 바인딩으로 추가한다.
     config->bindings[config->binding_count].gesture = gesture;
     config->bindings[config->binding_count].action = action;
     config->binding_count++;
@@ -118,6 +124,7 @@ static int set_mapping(app_config_t* config, const char* key, const char* value)
 }
 
 static int write_error(char* buffer, size_t size, const char* text) {
+    // 호출자에게 원인을 남기고 실패 값을 반환한다.
     if (buffer != NULL && size > 0) {
         strncpy(buffer, text, size - 1);
         buffer[size - 1] = '\0';
@@ -134,6 +141,7 @@ int config_load(const char* path, app_config_t* out_config, char* error_buffer, 
         return write_error(error_buffer, error_buffer_size, "config path is invalid");
     }
 
+    // 설정 파일을 한 줄씩 읽으며 기본값 위에 덮어쓴다.
     file = fopen(path, "r");
     if (file == NULL) {
         return write_error(error_buffer, error_buffer_size, "failed to open config file");
@@ -145,6 +153,7 @@ int config_load(const char* path, app_config_t* out_config, char* error_buffer, 
         char* value;
         line_number++;
 
+        // 주석/빈 줄은 무시한다.
         key = trim(line);
         if (*key == '\0' || *key == '#' || *key == ';') {
             continue;
@@ -156,6 +165,7 @@ int config_load(const char* path, app_config_t* out_config, char* error_buffer, 
             return write_error(error_buffer, error_buffer_size, "invalid config line (expected key=value)");
         }
 
+        // key=value 형태로 나눠서 각각 다시 trim 한다.
         *equals = '\0';
         value = trim(equals + 1);
         key = trim(key);
