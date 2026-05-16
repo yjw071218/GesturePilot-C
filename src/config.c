@@ -1,3 +1,4 @@
+// INI 설정을 읽고 기본 실행값을 채운다.
 #include "config.h"
 
 #include <ctype.h>

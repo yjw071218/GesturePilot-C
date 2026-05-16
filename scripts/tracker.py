@@ -1,3 +1,5 @@
+# Python tracker는 카메라 프레임에서 손동작을 해석해 C 코어로 보낸다.
+# 이 파일은 제스처 판단과 상태 추적의 중심이다.
 import cv2
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
@@ -14,6 +16,8 @@ import pygetwindow as gw
 from pynput.mouse import Button, Controller as MouseController
 from pynput.keyboard import Key, Controller as KeyboardController
 
+# 이 스크립트는 카메라 프레임을 읽어 손 모양을 해석하고, 결과를 C 코어로 보낸다.
+# 기본 원리: 손가락 비율을 열린 상태 기준과 비교해 굽힘 정도를 구하고, 그 변화로 눌림/해제를 나눈다.
 # 두 지점 사이의 유클리드 거리를 계산함
 def get_dist(p1, p2):
     return math.sqrt((p1.x - p2.x)**2 + (p1.y - p2.y)**2)

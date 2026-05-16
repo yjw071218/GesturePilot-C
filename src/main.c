@@ -1,3 +1,4 @@
+// C 코어는 Python 추론 결과를 받아 시스템 입력만 주입하는 실행 진입점이다.
 #include "action_mapper.h"
 #include "config.h"
 #include "inference.h"
@@ -19,7 +20,8 @@ static void sleep_ms(unsigned int ms) {
 }
 #endif
 
-// 프로그램 메인 시작점
+// C 코어는 추론 결과를 읽고 시스템 입력만 주입하는 얇은 실행 루프다.
+// 실제 손 추적과 제스처 해석은 Python tracker가 맡고, 이 파일은 연결과 입력만 담당한다.
 int main(int argc, char** argv) {
     app_config_t config;            // 설정 파일과 기본값을 담는 실행 설정
     inference_ctx_t inference_context; // 파이썬 추론 프로세스와 통신하는 컨텍스트

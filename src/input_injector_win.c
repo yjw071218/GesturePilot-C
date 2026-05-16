@@ -1,3 +1,4 @@
+// Windows API로 마우스와 키보드 입력을 주입한다.
 #include "input_injector.h"
 
 #include <stdio.h>

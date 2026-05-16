@@ -1,3 +1,4 @@
+// 연속 예측을 누적해 안정적인 제스처만 내보낸다.
 #include "temporal_filter.h"
 
 #include <string.h>

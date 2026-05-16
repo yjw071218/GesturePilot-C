@@ -1,3 +1,4 @@
+// Python tracker 프로세스를 실행하고 예측 라인을 읽는다.
 #include "inference.h"
 
 #include <stdio.h>

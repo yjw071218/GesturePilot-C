@@ -1,3 +1,4 @@
+// 문자열과 열거형 사이를 변환하는 공통 헬퍼다.
 #include "gesture_types.h"
 
 #include <ctype.h>

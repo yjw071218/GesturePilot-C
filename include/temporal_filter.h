@@ -1,3 +1,4 @@
+// 연속된 예측을 안정화하는 시간 필터 구조와 API다.
 #pragma once
 
 #include <stddef.h>
