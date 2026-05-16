@@ -21,8 +21,8 @@ static void sleep_ms(unsigned int ms) {
 
 // 프로그램 메인 시작점
 int main(int argc, char** argv) {
-    app_config_t config;
-    inference_ctx_t inference_context;
+    app_config_t config;            // 설정 파일과 기본값을 담는 실행 설정
+    inference_ctx_t inference_context; // 파이썬 추론 프로세스와 통신하는 컨텍스트
     
     // 설정 파일을 읽기 전에 기본값부터 채워 둠
     config_set_defaults(&config);
@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 
     // 추론 결과를 읽어서 입력으로 바꾸는 메인 루프
     while (1) {
-        prediction_t prediction = inference_run(&inference_context);
+        prediction_t prediction = inference_run(&inference_context); // 파이썬이 보낸 한 프레임의 예측 결과
         
         if (prediction.confidence < 0.0f) break;
         
@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
                                      prediction.scroll_delta, prediction.zoom_delta, 
                                      config.dry_run);
 
-        action_t action = action_mapper_resolve(&config, prediction.gesture);
+        action_t action = action_mapper_resolve(&config, prediction.gesture); // 제스처를 설정된 시스템 액션으로 변환
         if (action != ACTION_NONE) {
             input_injector_execute(action, config.dry_run);
         }

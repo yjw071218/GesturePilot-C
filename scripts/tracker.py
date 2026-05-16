@@ -199,10 +199,10 @@ class TrackerThread(QThread):
         last_detected_time = {'w': 0, 'd': 0, 'k': 0, 'p': 0}
         
         # 리듬게임 키 감지를 위한 손가락 상대 기준값과 변화량 기록
-        rhythm_open_ratio = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}
-        last_finger_bend = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}
-        rhythm_press_peak = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}
-        current_finger_ratio = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}
+        rhythm_open_ratio = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}  # 손가락이 편 상태의 상대 기준값
+        last_finger_bend = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}    # 이전 프레임의 굽힘 정도
+        rhythm_press_peak = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}    # 현재 누름 사이클에서 기록된 최대 굽힘값
+        current_finger_ratio = {'w': 0.0, 'd': 0.0, 'k': 0.0, 'p': 0.0}  # 현재 프레임의 손가락 비율 원본값
         
         # 리듬 모드 초저지연 상세 설정값
         MIN_KEY_HOLD_TIME = 0.003
@@ -225,14 +225,14 @@ class TrackerThread(QThread):
         RHYTHM_BEND_OPEN_VELOCITY = 0.005
         RHYTHM_FORCE_RELEASE_BEND = 0.012
         RHYTHM_RELEASE_FROM_PEAK_RATIO = 0.18
-        RHYTHM_RIGHT_BEND_PRESS_THRESHOLD = 0.022
-        RHYTHM_RIGHT_BEND_HOLD_THRESHOLD = 0.016
-        RHYTHM_RIGHT_BEND_STRONG_THRESHOLD = 0.040
-        RHYTHM_RIGHT_BEND_PRESS_VELOCITY = 0.007
-        RHYTHM_RIGHT_BEND_HOLD_VELOCITY = 0.005
-        RHYTHM_RIGHT_BEND_STRONG_VELOCITY = 0.010
-        RHYTHM_RIGHT_FORCE_RELEASE_BEND = 0.026
-        RHYTHM_RIGHT_FORCE_RELEASE_VELOCITY = 0.006
+        RHYTHM_RIGHT_BEND_PRESS_THRESHOLD = 0.022  # 오른손 K/P 눌림 시작 기준
+        RHYTHM_RIGHT_BEND_HOLD_THRESHOLD = 0.016   # 오른손 K/P 유지 기준
+        RHYTHM_RIGHT_BEND_STRONG_THRESHOLD = 0.040 # 오른손 K/P 확실한 눌림 기준
+        RHYTHM_RIGHT_BEND_PRESS_VELOCITY = 0.007   # 오른손 K/P 눌림 변화 속도 기준
+        RHYTHM_RIGHT_BEND_HOLD_VELOCITY = 0.005    # 오른손 K/P 유지 변화 속도 기준
+        RHYTHM_RIGHT_BEND_STRONG_VELOCITY = 0.010  # 오른손 K/P 강한 변화 속도 기준
+        RHYTHM_RIGHT_FORCE_RELEASE_BEND = 0.026     # 오른손 K/P 즉시 해제용 절대 굽힘 기준
+        RHYTHM_RIGHT_FORCE_RELEASE_VELOCITY = 0.006 # 오른손 K/P 즉시 해제용 변화 속도 기준
         RHYTHM_HAND_CLASS_SCORE = 0.58
         NORMAL_HAND_CLASS_SCORE = 0.72
         RHYTHM_MISSING_HAND_GRACE = 0.050
