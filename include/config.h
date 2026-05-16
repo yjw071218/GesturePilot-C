@@ -11,7 +11,7 @@
 
 #include <stddef.h>
 
-#include "gesture_types.h"
+#include "gesture_types.h"  // 제스처와 액션 공통 타입 정의
 
 // 모델/설정 파일 경로의 최대 길이
 #define GP_MAX_PATH 260

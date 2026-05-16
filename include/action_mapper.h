@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#include "config.h"
+#include "config.h"  // 앱 설정 구조체와 제스처-액션 바인딩 정의
 
 // 설정에 저장된 제스처-액션 연결을 실제 실행할 액션으로 바꿈
 action_t action_mapper_resolve(const app_config_t* config, gesture_t gesture);

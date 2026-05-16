@@ -7,10 +7,10 @@
  * @date        2026-05-17
  * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
-#include "action_mapper.h"
-#include "config.h"
-#include "inference.h"
-#include "input_injector.h"
+#include "action_mapper.h"  // 제스처와 실행 동작 매핑 선언
+#include "config.h"  // 설정값 로드 및 기본값 선언
+#include "inference.h"  // Python 추론 프로세스 연동 선언
+#include "input_injector.h"  // Windows 입력 이벤트 주입 선언
 
 #include <stdio.h>
 #include <stdlib.h>

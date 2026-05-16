@@ -7,7 +7,7 @@
  * @date        2026-05-17
  * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
-#include "gesture_types.h"
+#include "gesture_types.h"  // 손동작과 액션 공통 타입 선언
 
 #include <ctype.h>
 #include <string.h>

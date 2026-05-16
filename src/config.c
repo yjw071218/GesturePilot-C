@@ -7,7 +7,7 @@
  * @date        2026-05-17
  * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
-#include "config.h"
+#include "config.h"  // 실행 설정 구조체와 INI 파서 선언
 
 #include <ctype.h>
 #include <stdio.h>

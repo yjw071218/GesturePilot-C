@@ -7,7 +7,7 @@
  * @date        2026-05-17
  * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
-#include "temporal_filter.h"
+#include "temporal_filter.h"  // 안정화 필터 상태와 업데이트 함수 선언
 
 #include <string.h>
 

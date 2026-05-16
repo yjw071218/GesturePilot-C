@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#include "gesture_types.h"
+#include "gesture_types.h"  // 입력 주입에 필요한 제스처/액션 타입 정의
 
 // 추상화된 액션을 실제 시스템 입력으로 발생시킴
 int input_injector_execute(action_t action, int dry_run);

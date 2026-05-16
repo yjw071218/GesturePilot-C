@@ -7,7 +7,7 @@
  * @date        2026-05-17
  * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
-#include "input_injector.h"
+#include "input_injector.h"  // Windows 입력 주입 인터페이스 선언
 
 #include <stdio.h>
 #include <windows.h>

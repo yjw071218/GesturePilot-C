@@ -11,7 +11,7 @@
 
 #include <stddef.h>
 
-#include "gesture_types.h"
+#include "gesture_types.h"  // 필터링할 손동작 및 예측 결과 타입 정의
 
 typedef struct temporal_filter_t {
     gesture_t history[64];

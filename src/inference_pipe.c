@@ -7,7 +7,7 @@
  * @date        2026-05-17
  * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
-#include "inference.h"
+#include "inference.h"  // Python 추론 프로세스 연동 선언
 
 #include <stdio.h>
 #include <string.h>

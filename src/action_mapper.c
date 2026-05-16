@@ -7,7 +7,7 @@
  * @date        2026-05-17
  * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
-#include "action_mapper.h"
+#include "action_mapper.h"  // 제스처를 실행 액션으로 바꾸는 매핑 선언
 
 action_t action_mapper_resolve(const app_config_t* config, gesture_t gesture) {
     size_t index;
