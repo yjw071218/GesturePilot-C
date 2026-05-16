@@ -5,7 +5,7 @@
  * @author      유정우 (yjw071218@korea.ac.kr)
  * @version     1.2.0
  * @date        2026-05-17
- * @copyright   Copyright (c) 2026 Company Name. All rights reserved.
+ * @copyright   Copyright (c) 2026 Korea University. All rights reserved.
  */
 #include "temporal_filter.h"
 
